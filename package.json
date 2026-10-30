@@ -1,0 +1,26 @@
+{
+  "name": "null-protocol",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Wargame de hacking multijugador - terminal Linux simulada",
+  "license": "Proprietary",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "packageManager": "pnpm@9",
+  "scripts": {
+    "dev": "pnpm -r --parallel run dev",
+    "build": "pnpm -r run build",
+    "lint": "pnpm -r run lint",
+    "typecheck": "pnpm -r run typecheck",
+    "test": "pnpm -r run test",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9",
+    "lint-staged": "^15",
+    "prettier": "^3",
+    "@commitlint/cli": "^19",
+    "@commitlint/config-conventional": "^19"
+  }
+}
