@@ -1,0 +1,30 @@
+.terminal-container {
+  width: 100%;
+  height: calc(100vh - 32px);
+  background: #0c0c0b;
+  color: #ececea;
+  font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", "Consolas",
+    "Liberation Mono", "DejaVu Sans Mono", monospace;
+  font-size: 14px;
+  line-height: 1.2;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+.terminal-container .xterm {
+  width: 100%;
+  height: 100%;
+}
+
+.terminal-container .xterm-viewport {
+  overflow-y: auto;
+}
+
+.prompt-accent {
+  color: #dac278;
+}
+
+.text-primary {
+  color: #ececea;
+}

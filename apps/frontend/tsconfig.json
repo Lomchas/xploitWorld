@@ -13,7 +13,11 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "types": ["vite/client"]
+    "types": ["vite/client", "vitest/globals"],
+    "baseUrl": ".",
+    "paths": {
+      "@null-protocol/shared": ["../../packages/shared/src/index.ts"]
+    }
   },
   "include": ["src"],
   "extends": "../../tsconfig.base.json"
