@@ -1,36 +1,36 @@
-export type Placeholder = string;
-
-/** Difficulty levels for the wargame */
 export type Difficulty = "EASY" | "MEDIUM" | "HARD" | "EXPERT" | "NIGHTMARE";
 
-/** Level summary interface */
+/** Public DTO. The solution flag never leaves the server in catalog responses. */
 export interface LevelSummary {
   id: string;
   name: string;
   slug: string;
   description: string;
   difficulty: Difficulty;
-  flag: string;
   isActive: boolean;
   orderIndex: number;
 }
+export type LevelDetail = LevelSummary;
 
-/** Level detail interface */
-export interface LevelDetail extends LevelSummary {
-  // Full level details
+export interface SessionUser {
+  id: string;
+  username: string;
 }
 
-/** User progress entry interface */
 export interface UserProgressEntry {
   userId: string;
   levelId: string;
   completed: boolean;
   attempts: number;
-  completedAt: Date | null;
-  level: LevelDetail;
+  /** JSON uses ISO strings, not Date instances. */
+  completedAt: string | null;
+  level: LevelSummary;
 }
 
-/** Progress report interface */
+export interface FlagSubmission {
+  accepted: boolean;
+  progress: UserProgressEntry;
+}
 export interface ProgressReport {
   userId: string;
   levelProgress: UserProgressEntry[];

@@ -5,11 +5,14 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --incremental --tsBuildInfoFile dist/shared.tsbuildinfo",
     "lint": "eslint . --ext ts --report-unused-disable-directives --max-warnings 0",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json",
+    "dev": "tsc --watch --incremental --tsBuildInfoFile dist/shared.tsbuildinfo",
+    "test": "vitest run"
   },
   "devDependencies": {
-    "typescript": "^5.5.3"
+    "typescript": "~5.5.4",
+    "vitest": "^3.2.7"
   }
 }
