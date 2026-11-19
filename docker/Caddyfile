@@ -1,0 +1,50 @@
+{$XWD_MENU_HOST} {
+	encode zstd gzip
+	handle /health {
+		header Content-Type application/json
+		respond `{"status":"ok","mode":"menu"}` 200
+	}
+	handle {
+		root * /srv/menu
+		try_files {path} /index.html
+		header Cache-Control "no-cache"
+		file_server
+	}
+}
+
+{$XWD_STORY_HOST} {
+	encode zstd gzip
+	@backend path /api /api/* /health /ws
+	handle @backend {
+		reverse_proxy story:3000
+	}
+	handle /intro/* {
+		root * /srv/story
+		header Cache-Control "no-cache"
+		file_server
+	}
+	handle {
+		root * /srv/story
+		try_files {path} /index.html
+		header Cache-Control "no-cache"
+		file_server
+	}
+}
+
+{$XWD_PVP_HOST} {
+	encode zstd gzip
+	@backend path /api /api/* /health /ws
+	handle @backend {
+		reverse_proxy pvp:3000
+	}
+	@story path /intro /intro/*
+	handle @story {
+		respond 404
+	}
+	handle {
+		root * /srv/pvp
+		try_files {path} /index.html
+		header Cache-Control "no-cache"
+		file_server
+	}
+}

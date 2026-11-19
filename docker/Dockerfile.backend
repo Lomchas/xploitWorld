@@ -1,0 +1,14 @@
+FROM node:24-bookworm-slim AS build
+WORKDIR /opt/xwd
+RUN apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates && rm -rf /var/lib/apt/lists/*
+RUN corepack enable
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
+COPY scripts/prepare.mjs scripts/prepare.mjs
+COPY apps/backend apps/backend
+COPY packages/shared packages/shared
+RUN pnpm install --frozen-lockfile --filter @null-protocol/backend... \
+ && pnpm --filter @null-protocol/shared build \
+ && DATABASE_URL=postgresql://build:build@127.0.0.1:5432/build pnpm --filter @null-protocol/backend build
+WORKDIR /opt/xwd/apps/backend
+USER node
+CMD ["node", "dist/index.js"]

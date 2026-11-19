@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: xwd_demo
+      POSTGRES_PASSWORD: ${XWD_DEMO_DB_PASSWORD:?Falta la contraseña de prueba}
+      POSTGRES_DB: xwd_demo
+    ports:
+      - target: 5432
+        host_ip: 127.0.0.1
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U xwd_demo -d xwd_demo"]
+      interval: 2s
+      timeout: 3s
+      retries: 20

@@ -1,0 +1,22 @@
+FROM node:24-bookworm-slim AS build
+WORKDIR /opt/xwd
+RUN corepack enable
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
+COPY scripts/prepare.mjs scripts/prepare.mjs
+COPY packages/shared packages/shared
+COPY apps/frontend apps/frontend
+RUN pnpm install --frozen-lockfile --filter @null-protocol/frontend...
+ARG VITE_MENU_ORIGIN
+ARG VITE_STORY_ORIGIN
+ARG VITE_PVP_ORIGIN
+ENV VITE_MENU_ORIGIN=${VITE_MENU_ORIGIN} \
+    VITE_STORY_ORIGIN=${VITE_STORY_ORIGIN} \
+    VITE_PVP_ORIGIN=${VITE_PVP_ORIGIN} \
+    VITE_API_URL="" \
+    VITE_WS_URL="" \
+    VITE_STANDALONE_PVP=false
+RUN pnpm --filter @null-protocol/frontend build
+
+FROM caddy:2-alpine
+COPY --from=build /opt/xwd/apps/frontend/dist /srv
+COPY docker/Caddyfile /etc/caddy/Caddyfile

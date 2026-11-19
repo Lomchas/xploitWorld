@@ -1,0 +1,148 @@
+name: xploitworld-server
+
+services:
+  story-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: xwd_story
+      POSTGRES_DB: xwd_story
+      POSTGRES_PASSWORD: ${XWD_STORY_DB_PASSWORD:?Ejecuta pnpm servidor:config}
+    volumes:
+      - server_story_data:/var/lib/postgresql/data
+    networks: [story_internal]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U xwd_story -d xwd_story"]
+      interval: 4s
+      timeout: 4s
+      retries: 20
+
+  pvp-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: xwd_arena
+      POSTGRES_DB: xwd_arena
+      POSTGRES_PASSWORD: ${XWD_PVP_DB_PASSWORD:?Ejecuta pnpm servidor:config}
+    volumes:
+      - server_pvp_data:/var/lib/postgresql/data
+    networks: [pvp_internal]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U xwd_arena -d xwd_arena"]
+      interval: 4s
+      timeout: 4s
+      retries: 20
+
+  story:
+    image: xploitworld-server-backend
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.backend
+    restart: unless-stopped
+    environment:
+      GAME_MODE: story
+      HOST: 0.0.0.0
+      PORT: 3000
+      NODE_ENV: production
+      DATABASE_URL: postgresql://xwd_story:${XWD_STORY_DB_PASSWORD}@story-db:5432/xwd_story
+      FRONTEND_ORIGINS: https://${XWD_STORY_HOST:?Ejecuta pnpm servidor:config}
+      TRUST_PROXY_IPS: 172.29.210.2
+    command:
+      - sh
+      - -c
+      - node node_modules/prisma/build/index.js migrate deploy && node --import tsx prisma/seed.ts && exec node dist/index.js
+    depends_on:
+      story-db: { condition: service_healthy }
+    networks: [story_internal]
+    healthcheck: &api_health
+      test:
+        - CMD
+        - node
+        - -e
+        - fetch('http://127.0.0.1:3000/health', {signal:AbortSignal.timeout(2000)}).then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))
+      interval: 6s
+      timeout: 4s
+      start_period: 40s
+      retries: 20
+
+  pvp:
+    image: xploitworld-server-backend
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.backend
+    restart: unless-stopped
+    environment:
+      GAME_MODE: pvp
+      HOST: 0.0.0.0
+      PORT: 3000
+      NODE_ENV: production
+      DATABASE_URL: postgresql://xwd_arena:${XWD_PVP_DB_PASSWORD}@pvp-db:5432/xwd_arena
+      FRONTEND_ORIGINS: https://${XWD_PVP_HOST:?Ejecuta pnpm servidor:config}
+      TRUST_PROXY_IPS: 172.29.211.2
+    command:
+      - sh
+      - -c
+      - node node_modules/prisma/build/index.js migrate deploy && node --import tsx prisma/seed.ts && exec node dist/index.js
+    depends_on:
+      pvp-db: { condition: service_healthy }
+    networks: [pvp_internal]
+    healthcheck: *api_health
+
+  web:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.web
+      args:
+        VITE_MENU_ORIGIN: https://${XWD_MENU_HOST}
+        VITE_STORY_ORIGIN: https://${XWD_STORY_HOST}
+        VITE_PVP_ORIGIN: https://${XWD_PVP_HOST}
+    restart: unless-stopped
+    environment:
+      XWD_MENU_HOST: ${XWD_MENU_HOST}
+      XWD_STORY_HOST: ${XWD_STORY_HOST}
+      XWD_PVP_HOST: ${XWD_PVP_HOST}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - server_caddy_data:/data
+      - server_caddy_config:/config
+      - ../apps/frontend/public/intro:/srv/story/intro:ro
+    depends_on:
+      story: { condition: service_healthy }
+      pvp: { condition: service_healthy }
+    networks:
+      edge: {}
+      story_internal: { ipv4_address: 172.29.210.2 }
+      pvp_internal: { ipv4_address: 172.29.211.2 }
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "-q",
+          "-O",
+          "/dev/null",
+          "http://127.0.0.1:2019/config/",
+        ]
+      interval: 10s
+      timeout: 4s
+      retries: 12
+
+networks:
+  edge: {}
+  story_internal:
+    internal: true
+    ipam:
+      config: [{ subnet: 172.29.210.0/24 }]
+  pvp_internal:
+    internal: true
+    ipam:
+      config: [{ subnet: 172.29.211.0/24 }]
+
+volumes:
+  server_story_data:
+  server_pvp_data:
+  server_caddy_data:
+  server_caddy_config:
