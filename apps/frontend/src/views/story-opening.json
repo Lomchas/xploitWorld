@@ -1,0 +1,126 @@
+[
+  {
+    "art": 0,
+    "tag": [
+      "2061 · VANTA",
+      "2061 · VANTA"
+    ],
+    "title": [
+      "La primera guardia",
+      "The first watch"
+    ],
+    "beats": [
+      [
+        "Es el año dos mil sesenta y uno. Vanta es una ciudad de montaña. Aquí, una dirección también abre el acceso a una vida digital.",
+        "It is the year twenty sixty-one. Vanta is a city in the mountains. Here, an address also opens the door to a digital life."
+      ],
+      [
+        "El Core, administrado por UNO, conecta a cada habitante con su hogar, su buzón y los servicios de la ciudad.",
+        "The Core, run by the UNO network, connects every resident to their home, their mailbox and the city’s services. People use it every day."
+      ]
+    ]
+  },
+  {
+    "art": 1,
+    "tag": [
+      "00:16 UTC · OPERACIONES",
+      "00:16 UTC · OPERATIONS"
+    ],
+    "title": [
+      "Tu primer turno",
+      "Your first shift"
+    ],
+    "beats": [
+      [
+        "Estudias seguridad informática y hoy cubres tu primera guardia en UNO.",
+        "You are the new cybersecurity trainee. Tonight is your first watch at UNO. Your job is to listen to residents and record what you can verify."
+      ]
+    ]
+  },
+  {
+    "art": 2,
+    "tag": [
+      "ALMA · LLAMADA EN CURSO",
+      "ALMA · CALL IN PROGRESS"
+    ],
+    "title": [
+      "Un mensaje en el buzón",
+      "A message in the mailbox"
+    ],
+    "beats": [
+      [
+        "La última llamada viene de Alma, una vecina de Vanta.",
+        "The last call comes from Alma, a Vanta resident. She’s been trying to open her mailbox all night."
+      ],
+      [
+        "Mi hija me dejó un mensaje antes de salir de la escuela. ¿Puedes decirme si sigue ahí?",
+        "My daughter left me a message before she left school. Can you tell me if it’s still there?",
+        true
+      ]
+    ]
+  },
+  {
+    "art": 0,
+    "tag": [
+      "00:17 UTC · CORE",
+      "00:17 UTC · CORE"
+    ],
+    "title": [
+      "VANTA / SIN RUTA",
+      "VANTA / NO ROUTE"
+    ],
+    "cut": true,
+    "beats": [
+      [
+        "A las cero horas con diecisiete minutos, una orden de continuidad retira del Core las asociaciones que indican dónde encontrar Vanta y a quién pertenecen sus archivos.",
+        "At seventeen minutes past midnight, a continuity order removes the entries that tell the Core where to find Vanta and who owns its files."
+      ],
+      [
+        "El mapa pierde la ciudad. El portal deja de reconocer las direcciones de sus habitantes. La voz de Alma sigue en el auricular.",
+        "The city drops off the map. The portal stops recognizing its residents’ addresses. Alma’s voice is still on the line."
+      ]
+    ]
+  },
+  {
+    "art": 3,
+    "tag": [
+      "00:17:01 UTC · NORTE-02",
+      "00:17:01 UTC · NORTH-02"
+    ],
+    "title": [
+      "Una señal sigue llegando",
+      "One signal keeps coming"
+    ],
+    "beats": [
+      [
+        "Un segundo después del corte, el relé Norte recibe una señal. Hay equipos que todavía responden y copias de guardia que siguen intactas.",
+        "One second after the outage, the North relay receives a signal. Some equipment is still responding, and copies from the last shift are intact."
+      ],
+      [
+        "Eso te da una pista. La ruta que encuentra la ciudad y el servicio que conserva sus datos son dos cosas distintas.",
+        "That gives you a lead. The route that finds the city and the service that holds its data are two different things."
+      ]
+    ]
+  },
+  {
+    "art": 1,
+    "tag": [
+      "RELEVO · COPIA AUTORIZADA",
+      "HANDOVER · AUTHORIZED COPY"
+    ],
+    "title": [
+      "Conserva el último registro",
+      "Save the last log"
+    ],
+    "beats": [
+      [
+        "La jefa de guardia te entrega una copia autorizada de la carpeta del relevo.",
+        "The shift lead gives you an authorized copy of the handover folder. After this watch, you’ll receive archivist access to investigate the order and help residents regain access."
+      ],
+      [
+        "Conserva el último registro. Abre la terminal. Vanta necesita que alguien deje constancia de lo que pasó.",
+        "Save the last log. Open the terminal. Vanta needs someone to keep a record of what happened."
+      ]
+    ]
+  }
+]
