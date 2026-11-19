@@ -3,7 +3,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -26,19 +25,106 @@ enum Difficulty {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  username  String   @unique
-  email     String   @unique
-  password  String
-  role      UserRole @default(PLAYER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  username    String   @unique
+  email       String   @unique
+  password    String
+  role        UserRole @default(PLAYER)
+  balanceSats BigInt   @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  sessions     Session[]
-  progress     UserProgress[]
-  commands     Command[]
+  sessions        Session[]
+  progress        UserProgress[]
+  commands        Command[]
+  pvpProfile      PvpProfile?
+  workspace       WorkspaceEntry[]
+  academyLicenses AcademyLicense[]
+  academyProgress AcademyProgress[]
+  campaign        CampaignRun?
+  ledger          WalletEntry[]
+  economyReceipts EconomyReceipt[]
+  inventory       InventoryItem[]
+  duty            DutyAttempt?
+  migrationClaim  MigrationClaim?
 
   @@map("users")
+}
+
+model WorldIdentity {
+  id           Int     @id
+  mode         String
+  legacyImport String?
+
+  @@map("world_identity")
+}
+
+model MigrationClaim {
+  token  String @id
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("migration_claims")
+}
+
+model CampaignRun {
+  userId              String    @id
+  attempt             Int       @default(0)
+  grades              Json      @default("{}")
+  reviewed            Boolean   @default(false)
+  branches            String[]  @default([])
+  certificateCode     String?   @unique
+  certificateScore    Int?
+  certificateVariant  String?
+  certificateIssuedAt DateTime?
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("campaign_runs")
+}
+
+model AcademyLicense {
+  userId      String
+  toolId      String
+  activatedAt DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, toolId])
+  @@map("academy_licenses")
+}
+
+model AcademyProgress {
+  userId      String
+  lessonId    String
+  attempts    Int       @default(0)
+  completedAt DateTime?
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, lessonId])
+  @@map("academy_progress")
+}
+
+enum WorkspaceKind {
+  DIRECTORY
+  TEXT
+  IMAGE
+}
+
+model WorkspaceEntry {
+  userId    String
+  path      String
+  kind      WorkspaceKind
+  mode      Int
+  text      String?
+  image     Bytes?
+  mime      String?
+  digest    String?
+  bytes     Int           @default(0)
+  version   String
+  updatedAt DateTime      @updatedAt
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, path])
+  @@map("workspace_entries")
 }
 
 model Session {
@@ -75,17 +161,17 @@ model Level {
 }
 
 model UserProgress {
-  id         String   @id @default(cuid())
-  userId     String
-  levelId    String
-  completed  Boolean  @default(false)
-  attempts   Int      @default(0)
+  id          String    @id @default(cuid())
+  userId      String
+  levelId     String
+  completed   Boolean   @default(false)
+  attempts    Int       @default(0)
   completedAt DateTime?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
-  user  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  level Level   @relation(fields: [levelId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  level Level @relation(fields: [levelId], references: [id], onDelete: Cascade)
 
   @@unique([userId, levelId])
   @@index([userId])
@@ -94,15 +180,306 @@ model UserProgress {
 }
 
 model Command {
-  id          String   @id @default(cuid())
-  userId      String
-  command     String
-  output      String?
-  executedAt  DateTime @default(now())
+  id         String   @id @default(cuid())
+  userId     String
+  command    String
+  output     String?
+  executedAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([executedAt])
   @@map("commands")
+}
+
+model PvpRegion {
+  id       String       @id
+  revision Int          @default(0)
+  profiles PvpProfile[]
+
+  arenaRecords PvpArenaRecord[]
+  events       PvpEvent[]
+  links        PvpLink[]
+
+  @@map("pvp_regions")
+}
+
+model PvpProfile {
+  id            String    @id @default(cuid())
+  userId        String    @unique
+  regionId      String
+  arenaVisit    Int       @default(0)
+  alias         String
+  aliasKey      String
+  hostname      String?
+  addressNumber Int       @unique @default(autoincrement())
+  integrity     Int       @default(100)
+  energy        Int       @default(100)
+  energyAt      DateTime  @default(now())
+  attackReadyAt DateTime?
+  repairReadyAt DateTime?
+  lastSeenAt    DateTime  @default(now())
+  revision      Int       @default(0)
+  score         Int       @default(0)
+  compromises   Int       @default(0)
+  config        Json
+  createdAt     DateTime  @default(now())
+
+  user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  region        PvpRegion         @relation(fields: [regionId], references: [id], onDelete: Restrict)
+  events        PvpEvent[]
+  receipts      PvpReceipt[]
+  sales         MarketListing[]   @relation("MarketSeller")
+  purchases     MarketListing[]   @relation("MarketBuyer")
+  merchant      Merchant?
+  serviceOrders ServiceContract[] @relation("ServiceClient")
+  serviceJobs   ServiceContract[] @relation("ServiceProvider")
+  arenaRecords  PvpArenaRecord[]
+  outgoingLinks PvpLink[]         @relation("LinkSource")
+  incomingLinks PvpLink[]         @relation("LinkTarget")
+
+  @@unique([regionId, aliasKey])
+  @@index([regionId, lastSeenAt])
+  @@index([regionId, score, id])
+  @@map("pvp_profiles")
+}
+
+model PvpArenaRecord {
+  profileId   String
+  regionId    String
+  score       Int
+  compromises Int
+  profile     PvpProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  region      PvpRegion  @relation(fields: [regionId], references: [id], onDelete: Restrict)
+
+  @@id([profileId, regionId])
+  @@map("pvp_arena_records")
+}
+
+model PvpLink {
+  id         String     @id @default(cuid())
+  regionId   String
+  sourceId   String
+  targetId   String
+  protocol   String
+  port       Int
+  encryption String
+  openedAt   DateTime
+  closedAt   DateTime?
+  reason     String?
+  region     PvpRegion  @relation(fields: [regionId], references: [id], onDelete: Restrict)
+  source     PvpProfile @relation("LinkSource", fields: [sourceId], references: [id], onDelete: Cascade)
+  target     PvpProfile @relation("LinkTarget", fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@unique([regionId, sourceId, targetId, protocol, port])
+  @@index([regionId, sourceId, closedAt, openedAt])
+  @@index([regionId, targetId, closedAt, openedAt])
+  @@map("pvp_links")
+}
+
+model WalletEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  reference String
+  kind      String
+  deltaSats BigInt
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, reference])
+  @@index([userId, kind, createdAt])
+  @@map("wallet_entries")
+}
+
+model DutyAttempt {
+  userId  String   @id
+  day     String
+  stage   Int
+  retryAt DateTime
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("duty_attempts")
+}
+
+model PvpEvent {
+  id             String     @id @default(cuid())
+  profileId      String
+  regionId       String
+  arenaVisit     Int        @default(0)
+  ordinal        BigInt     @unique @default(autoincrement())
+  peerId         String?
+  kind           String
+  data           Json
+  createdAt      DateTime   @default(now())
+  acknowledgedAt DateTime?
+  profile        PvpProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  region         PvpRegion  @relation(fields: [regionId], references: [id], onDelete: Restrict)
+
+  @@index([profileId, ordinal])
+  @@index([profileId, kind, peerId, ordinal])
+  @@index([profileId, regionId, ordinal])
+  @@map("pvp_events")
+}
+
+model PvpReceipt {
+  profileId   String
+  requestId   String
+  fingerprint String
+  result      Json
+  createdAt   DateTime   @default(now())
+  profile     PvpProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@id([profileId, requestId])
+  @@map("pvp_receipts")
+}
+
+enum InventoryState {
+  READY
+  EQUIPPED
+  RESERVED
+  CONSUMED
+}
+
+enum ListingState {
+  OPEN
+  SOLD
+  CANCELED
+}
+
+enum ServiceState {
+  HIRED
+  DELIVERED
+  DISPUTED
+  PAID
+  REFUNDED
+}
+
+model EconomyLock {
+  id Int @id
+
+  @@map("economy_lock")
+}
+
+model EconomyReceipt {
+  userId      String
+  requestId   String
+  fingerprint String
+  result      Json
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, requestId])
+  @@map("economy_receipts")
+}
+
+model InventoryItem {
+  id         String          @id @default(cuid())
+  userId     String
+  sku        String
+  state      InventoryState  @default(READY)
+  acquiredAt DateTime        @default(now())
+  user       User            @relation(fields: [userId], references: [id], onDelete: Restrict)
+  listings   MarketListing[]
+
+  @@index([userId, state, sku])
+  @@map("inventory_items")
+}
+
+model MarketListing {
+  id        String        @id @default(cuid())
+  itemId    String
+  sellerId  String
+  buyerId   String?
+  priceSats BigInt
+  state     ListingState  @default(OPEN)
+  createdAt DateTime      @default(now())
+  closedAt  DateTime?
+  item      InventoryItem @relation(fields: [itemId], references: [id], onDelete: Restrict)
+  seller    PvpProfile    @relation("MarketSeller", fields: [sellerId], references: [id], onDelete: Restrict)
+  buyer     PvpProfile?   @relation("MarketBuyer", fields: [buyerId], references: [id], onDelete: Restrict)
+
+  @@index([state, createdAt])
+  @@index([sellerId, state])
+  @@index([buyerId, createdAt])
+  @@map("market_listings")
+}
+
+model WorldSignal {
+  id        String   @id @default(cuid())
+  regionId  String
+  actorId   String
+  rivalId   String
+  actorNode Int
+  rivalNode Int
+  kind      String
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([actorId, kind, createdAt])
+  @@map("world_signals")
+}
+
+model Merchant {
+  profileId   String         @id
+  description String
+  updatedAt   DateTime       @updatedAt
+  profile     PvpProfile     @relation(fields: [profileId], references: [id], onDelete: Restrict)
+  offers      ServiceOffer[]
+
+  @@map("merchants")
+}
+
+model ServiceOffer {
+  id          String            @id @default(cuid())
+  merchantId  String
+  kind        String
+  title       String
+  description String
+  priceSats   BigInt
+  hours       Int
+  active      Boolean           @default(true)
+  revision    Int               @default(0)
+  updatedAt   DateTime          @updatedAt
+  merchant    Merchant          @relation(fields: [merchantId], references: [profileId], onDelete: Restrict)
+  contracts   ServiceContract[]
+
+  @@unique([merchantId, kind])
+  @@index([active, updatedAt])
+  @@map("service_offers")
+}
+
+model ServiceContract {
+  id          String       @id @default(cuid())
+  offerId     String
+  clientId    String
+  providerId  String
+  kind        String
+  title       String
+  description String?
+  scope       Json?
+  report      String?
+  effect      String?
+  feePercent  Int          @default(0)
+  priceSats   BigInt
+  state       ServiceState @default(HIRED)
+  hiredAt     DateTime     @default(now())
+  dueAt       DateTime
+  deliveredAt DateTime?
+  evidenceId  String?      @unique
+  evidence    String?
+  disputedAt  DateTime?
+  dispute     String?
+  settledAt   DateTime?
+  resolution  String?
+  rating      Int?
+  offer       ServiceOffer @relation(fields: [offerId], references: [id], onDelete: Restrict)
+  client      PvpProfile   @relation("ServiceClient", fields: [clientId], references: [id], onDelete: Restrict)
+  provider    PvpProfile   @relation("ServiceProvider", fields: [providerId], references: [id], onDelete: Restrict)
+
+  @@index([clientId, hiredAt])
+  @@index([providerId, state])
+  @@index([state, dueAt])
+  @@index([state, deliveredAt])
+  @@map("service_contracts")
 }
