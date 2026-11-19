@@ -1,41 +1,43 @@
 module.exports = {
   root: true,
-  env: { es2022: true },
+  env: { node: true, es2022: true },
   parser: "@typescript-eslint/parser",
-  parserOptions: {
-    ecmaVersion: "latest",
-    sourceType: "module",
+  parserOptions: { ecmaVersion: "latest", sourceType: "module" },
+  extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+  plugins: ["@typescript-eslint"],
+  rules: {
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      { argsIgnorePattern: "^_", caughtErrorsIgnorePattern: "^_" },
+    ],
   },
   overrides: [
     {
-      files: ["apps/frontend/**/*.{ts,tsx}"],
-      extends: [
-        "eslint:recommended",
-        "plugin:@typescript-eslint/recommended",
-        "plugin:react-hooks/recommended",
-      ],
-      plugins: ["react-refresh", "@typescript-eslint"],
+      files: ["apps/frontend/src/**/*.{ts,tsx}"],
+      env: { browser: true },
+      extends: ["plugin:react-hooks/recommended"],
+      plugins: ["react-refresh"],
       rules: {
-        "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
-        "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+        "react-refresh/only-export-components": [
+          "error",
+          { allowConstantExport: true },
+        ],
       },
     },
     {
-      files: ["apps/backend/**/*.ts"],
-      extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
-      plugins: ["@typescript-eslint"],
-      rules: {
-        "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
-      },
+      files: ["**/*.test.{ts,tsx}"],
+      plugins: ["vitest-globals"],
+      env: { "vitest-globals/env": true },
     },
     {
-      files: ["packages/shared/**/*.ts"],
-      extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
-      plugins: ["@typescript-eslint"],
-      rules: {
-        "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
-      },
+      files: ["**/*.cjs", "commitlint.config.js"],
+      rules: { "@typescript-eslint/no-var-requires": "off" },
     },
   ],
-  ignorePatterns: ["dist", "node_modules", ".eslintrc.cjs"],
+  ignorePatterns: [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/coverage/**",
+    "**/generated/**",
+  ],
 };

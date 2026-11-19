@@ -5,22 +5,50 @@
   "description": "Wargame de hacking multijugador - terminal Linux simulada",
   "license": "Proprietary",
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=24.15.0 <25",
+    "pnpm": ">=9.15.9 <10"
   },
-  "packageManager": "pnpm@9",
+  "packageManager": "pnpm@9.15.9",
   "scripts": {
-    "dev": "pnpm -r --parallel run dev",
+    "dev": "node scripts/worlds.mjs dev",
+    "jugar": "node scripts/play.mjs",
+    "servidor:config": "node scripts/server.mjs config",
+    "servidor:iniciar": "node scripts/server.mjs start",
     "build": "pnpm -r run build",
-    "lint": "pnpm -r run lint",
-    "typecheck": "pnpm -r run typecheck",
-    "test": "pnpm -r run test",
-    "prepare": "husky"
+    "lint": "eslint . --ext .ts,.tsx,.mts,.js,.cjs --max-warnings 0",
+    "typecheck": "pnpm --filter @null-protocol/shared build && pnpm -r run typecheck",
+    "test": "pnpm --filter @null-protocol/shared build && pnpm -r run test",
+    "prepare": "node scripts/prepare.mjs",
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+    "format": "prettier --write .",
+    "prisma:generate": "pnpm --filter @null-protocol/backend prisma:generate",
+    "prisma:migrate:dev": "pnpm --filter @null-protocol/backend prisma:migrate:dev",
+    "prisma:migrate:deploy": "pnpm --filter @null-protocol/backend prisma:migrate:deploy",
+    "prisma:seed": "pnpm --filter @null-protocol/shared build && pnpm --filter @null-protocol/backend prisma:seed",
+    "resolve:dispute": "node scripts/worlds.mjs admin resolve:dispute",
+    "demo:pvp": "node scripts/worlds.mjs admin demo:pvp",
+    "db:setup": "node scripts/worlds.mjs db",
+    "test:integration": "pnpm --filter @null-protocol/backend test:integration",
+    "preview": "node scripts/worlds.mjs preview",
+    "migrate:split": "node scripts/worlds.mjs migrate",
+    "build:pvp": "node scripts/arena.mjs build",
+    "start:pvp": "node scripts/arena.mjs host",
+    "compartir:pvp": "node scripts/arena.mjs share"
   },
   "devDependencies": {
     "husky": "^9",
     "lint-staged": "^15",
     "prettier": "^3",
     "@commitlint/cli": "^19",
-    "@commitlint/config-conventional": "^19"
+    "@commitlint/config-conventional": "^19",
+    "eslint": "^8.57.0",
+    "@typescript-eslint/eslint-plugin": "^7.15.0",
+    "@typescript-eslint/parser": "^7.15.0",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-refresh": "^0.4.7",
+    "eslint-plugin-vitest-globals": "^1.5.0",
+    "typescript": "~5.5.4",
+    "vitest": "^3.2.7",
+    "@types/node": "^24.0.0"
   }
 }
