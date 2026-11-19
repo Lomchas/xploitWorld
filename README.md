@@ -1,100 +1,44 @@
-# NULL_PROTOCOL
+# XploitworlD M6.5
 
-**Wargame de hacking multijugador — terminal Linux simulada**
+El menú principal abre dos juegos con servidores y guardados propios. **Historia** sigue la investigación de Vanta en la campaña UNO. **PvP** abre tu computadora de Arena con archivos personales, dispositivos, Atlas, herramientas defensivas y contratos.
 
-[![CI Status](https://img.shields.io/github/actions/status/null-protocol/null-protocol?label=CI)](https://github.com/null-protocol/null-protocol/actions)
-[![Node Version](https://img.shields.io/badge/node-%3E=20.0.0-green)](https://nodejs.org/)
-[![License](https://img.shields.io/badge/license-Proprietary-blue)](LICENSE)
+## Iniciar en Windows
 
-## Visión
+Con Docker Desktop abierto, ejecuta en PowerShell desde `null-protocol`.
 
-NULL_PROTOCOL es un wargame de hacking multijugador donde el jugador opera
-exclusivamente a través de una terminal Linux simulada. Disponible en web,
-desktop y móvil con un solo código base.
-
-## Stack
-
-| Capa          | Tecnología                                      |
-| ------------- | ----------------------------------------------- |
-| Frontend      | React 18 + Vite 5 + TypeScript + Tailwind CSS 3 |
-| Desktop       | Tauri                                           |
-| Móvil         | Capacitor                                       |
-| Backend       | Node.js 20 + Express 4 + TypeScript             |
-| Base de datos | PostgreSQL 16                                   |
-| Caché         | Redis 7                                         |
-| Monorepo      | pnpm workspaces                                 |
-
-## Estructura del repo
-
-```
-null-protocol/
-├── apps/
-│   ├── frontend/   # Vite + React + TS
-│   ├── backend/    # Express + TS
-│   ├── desktop/    # Tauri (Fase 3)
-│   └── mobile/     # Capacitor (Fase 2)
-├── packages/
-│   └── shared/     # Tipos y utilidades compartidas
-├── docker/         # Docker Compose (Postgres + Redis)
-├── docs/           # ARCHITECTURE.md, CONTRIBUTING.md
-├── .github/
-│   └── workflows/  # CI/CD
-├── .husky/         # Git hooks
-├── package.json    # Workspace root
-├── pnpm-workspace.yaml
-├── tsconfig.base.json
-└── README.md
+```powershell
+pnpm install --frozen-lockfile
+pnpm jugar
 ```
 
-## Setup rápido
+Abre <http://127.0.0.1:5173>. Los archivos de configuración local vienen incluidos. Si tienes una partida de M6.4, consulta [Actualizar desde M6.4](SETUP_GUIDE.md#actualizar-desde-m64) antes de abrir los nuevos modos.
 
-1. Instala dependencias:
+## Historia
 
-   ```bash
-   pnpm install
-   ```
+La primera partida abre **La primera guardia**, una cinemática con voz, subtítulos y transcripción en español o inglés. Pulsa **Iniciar historia con voz**. Al terminar, el juego abre la terminal automáticamente. Desde **Pausa → Partidas guardadas** puedes volver a ver la introducción.
 
-2. Levanta servicios de desarrollo (PostgreSQL + Redis):
+- `cat README.txt` abre el encargo de la guardia.
+- `echo "nota.txt"` abre el editor. Ctrl+O guarda y Ctrl+X cierra.
+- `mission continuar` retoma el siguiente escenario. `hint` ofrece una pista y `check` entrega la evidencia de campaña.
+- En **Pausa → Exchange** están la tienda, el inventario y las recompensas de Historia. El taller abre la misión 1.08. El SSD abre la 5.05 y amplía la capacidad de archivos.
+- Los expedientes de práctica, los archivos de trabajo y el progreso se guardan en Historia.
 
-   ```bash
-   docker compose -f docker/docker-compose.yml up -d
-   ```
+## PvP
 
-3. Copia las variables de entorno:
+Crea un usuario y un nombre de equipo para ver tu escritorio. Las herramientas de defensa vienen instaladas. Desde el escritorio se abren la terminal, los archivos, el Atlas, el dispositivo y los contratos. La terminal opera sobre los archivos de Arena. Escribe `help` para ver las utilidades y `export-log nota.txt` para guardar una copia de la bitácora de tu equipo.
 
-   ```bash
-   cp apps/backend/.env.example apps/backend/.env
-   cp apps/frontend/.env.example apps/frontend/.env
-   ```
+En **Atlas de señales** puedes desplegarte en 208 ubicaciones de capitales y sedes. Usa el mapa o el directorio para ver la hora, el aforo, la actividad y las reglas de cada arena. Filtra por cupos libres y alterna entre la actividad de la capital seleccionada y la global. Puedes pulsar cada barra del gráfico para consultar su desglose horario. Al trasladar tu equipo cambian tu red virtual y los rivales visibles. Consulta el [diseño y las fuentes del Atlas](docs/ATLAS.md).
 
-4. Inicia todo en modo desarrollo:
-   ```bash
-   pnpm dev
-   ```
+Los **BTC de Arena** se usan en contratos entre operadores. La plataforma retiene el pago, valida la entrega sobre el activo autorizado y aplica los cambios de mantenimiento o recuperación al equipo del cliente. El operador vincula su cuenta de Arena en **Contratos**. El laboratorio usa simulaciones defensivas y redes virtuales del juego.
 
-- Frontend: http://localhost:5173
-- Backend: http://localhost:3000 (GET /health)
+Para alojar el menú y ambos modos, sigue la [guía del servidor completo](docs/SERVIDOR_COMPLETO.md). Incluye la configuración automática de las dos bases, HTTPS y la ruta para reemplazar la introducción. La [guía de pruebas PvP](docs/PRUEBAS_REMOTAS.md) documenta la conexión entre operadores.
 
-## Scripts disponibles
+## Desarrollo y comprobación
 
-| Script           | Descripción                              |
-| ---------------- | ---------------------------------------- |
-| `pnpm dev`       | Levanta frontend y backend en paralelo   |
-| `pnpm build`     | Construye todos los paquetes             |
-| `pnpm lint`      | Ejecuta ESLint en todos los paquetes     |
-| `pnpm typecheck` | Ejecuta TypeScript en todos los paquetes |
-| `pnpm test`      | Ejecuta tests en todos los paquetes      |
+```powershell
+pnpm check
+```
 
-## Documentación
+La compilación genera tres sitios en `apps/frontend/dist`. Consulta la [guía de instalación y despliegue](SETUP_GUIDE.md) para arrancar cada modo de forma independiente, migrar una partida y ejecutar las pruebas con PostgreSQL.
 
-- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — Resumen del blueprint
-- [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) — Reglas de commit y PR
-
-## Contribuir
-
-Consulta [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) para el flujo de
-branches y convenciones de commit (Conventional Commits).
-
-## Licencia
-
-Proprietary
+El código mantiene la declaración de licencia privada del proyecto original. La [ficha de la cinemática](docs/CINEMATICA_VANTA.md) documenta las voces y los archivos incluidos.
