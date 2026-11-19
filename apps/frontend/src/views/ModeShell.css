@@ -1,0 +1,20 @@
+.mode-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  padding: 0.8rem max(1rem, 3vw);
+  border-bottom: 1px solid var(--game-line);
+}
+.mode-panel a,
+.mode-footer a {
+  padding: 0.35rem;
+  color: var(--fg-primary);
+}
+.mode-pause {
+  border: 1px solid var(--game-line);
+  padding: 0.4rem 0.7rem;
+  border-radius: 4px;
+}
+.mode-footer {
+  padding: 1rem max(1rem, 3vw);
+}

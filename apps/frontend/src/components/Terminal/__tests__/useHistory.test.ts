@@ -1,4 +1,4 @@
-import { useHistory } from "../useHistory";
+import { createHistory as useHistory } from "../useHistory";
 
 describe("useHistory", () => {
   it("should navigate up to the oldest command after adding 3", () => {

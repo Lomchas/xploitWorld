@@ -1,59 +1,53 @@
 import { useEffect, useState } from "react";
-import { getWsClient, type ConnectionStatus } from "../../lib/ws-client";
-import "./TopBar.css";
+import { useConnectionStatus } from "../../hooks/useConnectionStatus";
+import type { WorldPulse } from "../../hooks/useWorld";
 
-export function TopBar({ wsUrl }: { wsUrl: string }) {
-  const [status, setStatus] = useState<ConnectionStatus>("closed");
-
+export function TopBar({ wsUrl, pulse }: { wsUrl: string; pulse: WorldPulse }) {
+  const status = useConnectionStatus(wsUrl);
+  const [time, setTime] = useState(() => new Date());
   useEffect(() => {
-    const client = getWsClient(wsUrl);
-    setStatus(client.getStatus());
-
-    const unsubscribe = client.onStatus((newStatus) => {
-      setStatus(newStatus);
-    });
-
-    if (client.getStatus() === "closed") {
-      client.connect();
-    }
-
-    return () => {
-      unsubscribe();
-    };
-  }, [wsUrl]);
-
-  const getStatusDisplay = () => {
-    switch (status) {
-      case "open":
-        return (
-          <>
-            <span className="status-dot connected"></span>
-            <span className="status-text">ONLINE</span>
-          </>
-        );
-      case "connecting":
-        return (
-          <>
-            <span className="status-dot connecting"></span>
-            <span className="status-text">CONNECTING...</span>
-          </>
-        );
-      default:
-        return (
-          <>
-            <span className="status-dot disconnected"></span>
-            <span className="status-text">OFFLINE</span>
-          </>
-        );
-    }
-  };
-
+    const timer = window.setInterval(() => setTime(new Date()), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
+  const online = pulse.world?.regions.reduce(
+    (count, region) => count + region.online,
+    0,
+  );
   return (
-    <header className="topbar">
-      <div className="topbar-brand">
-        NULL_PROTOCOL <span className="topbar-version">// v0.0.0</span>
+    <header className="station-topbar">
+      <div className="station-brand">
+        <span>
+          XploitworlD
+          <span className="brand-cursor" aria-hidden="true">
+            _
+          </span>
+        </span>
+        <div className="station-brand-info">
+          <span className="station-brand-description">OPERACIONES CIBER</span>
+          <span className="station-version">M6.2</span>
+        </div>
       </div>
-      <div className="topbar-status">{getStatusDisplay()}</div>
+      <div className="station-health" aria-label="Estado de la red">
+        <span
+          className={status === "open" ? "health-live" : "health-warn"}
+          role="status"
+        >
+          {status === "open"
+            ? "EN LÍNEA"
+            : status === "connecting"
+              ? "ENLAZANDO"
+              : "SIN ENLACE"}
+        </span>
+        <span>
+          {pulse.stale
+            ? "LECTURA ANTERIOR"
+            : `${online ?? "—"} OPERADOR${online === 1 ? "" : "ES"}`}
+        </span>
+        <span>RTT {pulse.latency === null ? "—" : pulse.latency + " ms"}</span>
+      </div>
+      <time className="station-clock" dateTime={time.toISOString()}>
+        {time.toLocaleTimeString("es-CO", { hour12: false })}
+      </time>
     </header>
   );
 }

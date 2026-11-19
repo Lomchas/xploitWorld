@@ -6,8 +6,16 @@ describe("autocomplete", () => {
   });
 
   it("should return matching commands for single letter", () => {
-    expect(autocomplete("l")).toEqual(["ls"]);
-    expect(autocomplete("c")).toEqual(["cd", "cat", "clear"]);
+    expect(autocomplete("l")).toEqual(["levels", "listar_operaciones", "ls"]);
+    expect(autocomplete("c")).toEqual([
+      "cat",
+      "cd",
+      "certificado",
+      "check",
+      "chmod",
+      "clear",
+      "curl",
+    ]);
   });
 
   it("should return empty array for non-matching buffer", () => {

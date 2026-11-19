@@ -1,0 +1,151 @@
+.arena-desktop,
+.arena-terminal {
+  --arena-panel: #102134;
+  --arena-line: #2f506d;
+  --arena-text: #e6f4ff;
+  --arena-accent: #a7dfff;
+  color: var(--arena-text);
+  background: radial-gradient(
+    ellipse at 74% 8%,
+    #183d56 0,
+    #0e1d2e 42%,
+    #091522 85%
+  );
+  border: 1px solid var(--arena-line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.arena-desktop {
+  min-height: min(620px, 77vh);
+  padding: clamp(1rem, 5vw, 3rem);
+}
+.arena-top h2 {
+  margin: 0.25rem 0;
+  font:
+    700 clamp(1.8rem, 7vw, 4.5rem)/1.05 "Geist",
+    system-ui,
+    sans-serif;
+  letter-spacing: -0.065em;
+}
+.arena-kicker {
+  margin: 0;
+  color: var(--arena-accent);
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+}
+.arena-top span {
+  margin-left: 0.75rem;
+  color: #ffdc98;
+}
+.arena-desktop a,
+.arena-terminal a {
+  color: var(--arena-accent);
+}
+.arena-launcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin: 2rem 0;
+}
+.arena-launcher a,
+.arena-launcher button {
+  display: grid;
+  place-items: center;
+  gap: 0.35rem;
+  text-decoration: none;
+  min-height: 84px;
+  min-width: 94px;
+  padding: 0.65rem;
+  border-radius: 7px;
+  background: #102134ee;
+  color: var(--arena-text);
+  border: 1px solid #30516b;
+}
+.arena-launcher a:hover,
+.arena-launcher button:hover {
+  background: #203c55;
+}
+.arena-launcher span {
+  font-size: 1.55rem;
+  color: var(--arena-accent);
+  line-height: 1;
+}
+.arena-deploy {
+  display: grid;
+  gap: 0.7rem;
+  max-width: 430px;
+  margin: 1.75rem 0 1rem;
+}
+.arena-deploy label {
+  display: grid;
+  gap: 0.32rem;
+}
+.arena-deploy input,
+.arena-deploy select,
+.arena-terminal input {
+  padding: 0.5rem;
+  background: #091622;
+  color: var(--arena-text);
+  border: 1px solid var(--arena-line);
+  border-radius: 4px;
+}
+.arena-deploy button,
+.arena-terminal button,
+.arena-files button {
+  color: var(--arena-accent);
+  padding: 0.5rem;
+  border: 1px solid var(--arena-line);
+  border-radius: 4px;
+}
+.arena-files {
+  background: #102134;
+  border: 1px solid var(--arena-line);
+  border-radius: 6px;
+  padding: 1rem;
+  margin: 0.8rem 0;
+}
+.arena-files h2 {
+  margin: 0 0 0.5rem;
+}
+.arena-files ul {
+  padding-left: 1.15rem;
+}
+.arena-files li {
+  margin-block: 0.45rem;
+}
+.arena-terminal {
+  width: 100%;
+  min-height: min(65vh, 460px);
+  display: flex;
+  flex-direction: column;
+}
+.arena-terminal pre {
+  flex: 1;
+  min-height: 170px;
+  max-height: 66vh;
+  overflow: auto;
+  margin: 0;
+  padding: 1rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.arena-terminal form {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  padding: 0.65rem;
+  background: var(--arena-panel);
+}
+.arena-terminal input {
+  flex: 1;
+  min-width: 10ch;
+}
+.arena-terminal > p,
+.arena-terminal > a {
+  padding: 0.65rem;
+}
+.arena-terminal label {
+  color: var(--arena-accent);
+  overflow-wrap: anywhere;
+}

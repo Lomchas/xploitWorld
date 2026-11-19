@@ -1,0 +1,603 @@
+.trade-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+  gap: 10px;
+  margin: 10px 0;
+}
+.trade-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+.trade-card .pvp-section-title {
+  align-self: stretch;
+}
+.trade-card p {
+  margin: 3px 0;
+}
+.trade-card h3 {
+  margin: 3px 0;
+}
+.trade-price {
+  color: #ffdb72;
+}
+.trade-form {
+  align-self: stretch;
+  padding-top: 5px;
+}
+.trade-desk .station-pad > .pvp-tabs {
+  margin-bottom: 10px;
+}
+.service-desk {
+  display: grid;
+  gap: 12px;
+}
+.service-desk textarea {
+  width: 100%;
+  min-height: 54px;
+  max-width: 100%;
+  color: inherit;
+  background: var(--pvp-field);
+  border: 1px solid var(--pvp-line);
+  border-radius: 4px;
+  padding: 7px;
+  font: inherit;
+}
+.service-desk .trade-form select {
+  max-width: min(100%, 500px);
+}
+.trade-desk .workshop {
+  margin-top: 12px;
+}
+.trade-desk pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.exchange-header {
+  min-height: 118px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: end;
+  gap: 18px;
+  padding: 12px 0 20px;
+}
+.exchange-header h1 {
+  font-family: "Geist", "Segoe UI", system-ui, sans-serif;
+  font-size: clamp(2.15rem, 5vw, 3.8rem);
+  letter-spacing: -0.055em;
+  line-height: 1;
+  text-shadow: none;
+}
+.exchange-header p {
+  color: var(--fg-muted);
+  margin-bottom: 0;
+}
+.exchange-wallet {
+  display: grid;
+  gap: 4px;
+  padding: 11px 16px;
+  min-width: 140px;
+  background: var(--bg-panel);
+  border: 1px solid var(--game-line);
+  border-radius: 7px;
+  text-decoration: none;
+}
+.exchange-wallet span {
+  color: var(--fg-muted);
+  font-size: 0.74rem;
+}
+.exchange-wallet strong {
+  color: var(--gold);
+  font-size: 1.18rem;
+}
+.exchange-board {
+  min-width: 0;
+  background: var(--bg-panel);
+  border: 1px solid var(--game-line);
+  border-radius: 11px;
+}
+.exchange-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 5px 10px;
+  padding: 7px clamp(12px, 3vw, 24px) 0;
+  border-bottom: 1px solid var(--game-line);
+}
+.exchange-tabs > a,
+.exchange-tabs > button {
+  display: flex;
+  align-items: center;
+  min-height: 47px;
+  padding: 0 10px;
+  font-size: 0.85rem;
+  text-decoration: none;
+  color: var(--fg-muted);
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: none;
+}
+.exchange-tabs > a:hover,
+.exchange-tabs > a[aria-current] {
+  color: var(--fg-primary);
+  border-bottom-color: var(--neon-green);
+}
+.exchange-tabs > button {
+  margin-inline-start: auto;
+}
+.exchange-body {
+  padding: clamp(12px, 3vw, 24px);
+  min-width: 0;
+}
+.exchange-body .academy-catalog-switch {
+  padding: 0;
+  margin-bottom: 16px;
+}
+.shop-filters,
+.service-intro,
+.service-switch {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin-block: 4px 16px;
+}
+.shop-filters input {
+  width: min(100%, 25ch);
+}
+.shop-filters > label,
+.service-intro > label {
+  display: grid;
+  gap: 5px;
+  font-size: 0.82rem;
+}
+.shop-filters [role="group"] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.shop-filters button[aria-pressed="true"],
+.service-switch button[aria-pressed="true"] {
+  border-color: var(--station-frame);
+  color: var(--neon-green);
+  background: var(--game-soft);
+}
+.equipment-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.equipment-card {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--game-line);
+  border-radius: 8px;
+  background: var(--bg-primary);
+}
+.equipment-card:hover {
+  border-color: var(--station-frame);
+}
+.pvp-view .product-open {
+  display: block;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 7px 7px 0 0;
+  background: #191a1b;
+  width: 100%;
+}
+.product-art {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1.62;
+  display: block;
+  object-fit: contain;
+  background: #1a1a1a;
+}
+.product-open .product-art {
+  object-fit: cover;
+  object-position: center;
+  transition: transform 180ms ease;
+}
+.product-open:hover .product-art {
+  transform: scale(1.035);
+}
+.product-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 14px;
+}
+.product-copy h3,
+.exchange-dialog h2,
+.duty-card h3,
+.rewards-desk > section > h3 {
+  font-family: "Geist", "Segoe UI", system-ui, sans-serif;
+  text-shadow: none;
+  letter-spacing: -0.015em;
+  font-size: 1.13rem;
+  font-weight: 690;
+}
+.product-copy p {
+  font-size: 0.83rem;
+  color: var(--fg-muted);
+}
+.product-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px;
+  margin: 0 0 8px;
+  color: var(--fg-muted);
+  font-size: 0.7rem;
+}
+.product-footer {
+  align-self: stretch;
+  margin-top: auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding-top: 10px;
+}
+.product-footer strong,
+.product-stat {
+  color: var(--gold);
+}
+.product-footer button {
+  white-space: normal;
+}
+.story-purchase {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  margin-bottom: 18px;
+  padding: 13px 14px;
+  border-left: 2px solid var(--gold);
+  background: var(--game-soft);
+  font-size: 0.84rem;
+}
+.story-purchase > div {
+  flex: 1 1 235px;
+  display: grid;
+  gap: 3px;
+}
+.story-purchase a,
+.reward-item-action a,
+.product-links a {
+  text-underline-offset: 4px;
+}
+.inventory-card .product-art {
+  width: 100%;
+  border-radius: 5px;
+}
+.trade-access {
+  border-left: 2px solid var(--gold);
+  padding: 7px 12px;
+  color: var(--fg-muted);
+}
+.exchange-pill {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--game-line);
+  font-size: 0.73rem;
+}
+.exchange-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(calc(100% - 28px), 760px);
+  max-height: calc(100dvh - 28px);
+  overflow: auto;
+  padding: 0;
+  border-radius: 10px;
+  border: 1px solid var(--station-frame);
+  background: var(--bg-panel);
+  color: var(--fg-primary);
+  box-shadow: 0 20px 70px #0009;
+}
+.exchange-dialog::backdrop {
+  background: #000b;
+}
+.exchange-dialog > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--game-line);
+}
+.exchange-dialog > header button {
+  min-width: 36px;
+}
+.product-detail {
+  display: grid;
+  grid-template-columns: 0.85fr 1fr;
+  gap: 18px;
+  padding: 18px;
+}
+.product-detail .product-art {
+  aspect-ratio: 1;
+  border-radius: 5px;
+}
+.product-detail-copy {
+  min-width: 0;
+}
+.product-detail-copy ol,
+.contract-scope ul {
+  padding-inline-start: 22px;
+  list-style-type: decimal;
+  margin-block: 8px;
+}
+.product-detail-copy li {
+  font-size: 0.85rem;
+  margin: 5px 0;
+}
+.product-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 13px;
+  font-size: 0.8rem;
+}
+.product-checkout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 18px;
+  padding: 12px 18px;
+  border-top: 1px solid var(--game-line);
+}
+.product-checkout > label {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.product-checkout input {
+  width: 68px;
+}
+.product-checkout [role="status"],
+.product-checkout [role="alert"] {
+  flex-basis: 100%;
+}
+.pvp-view .exchange-action {
+  background: var(--game-soft);
+  border-color: var(--station-frame);
+  color: var(--fg-primary);
+  text-decoration: none;
+  padding: 9px 13px;
+  border-radius: 5px;
+  border-style: solid;
+  border-width: 1px;
+}
+.rewards-desk {
+  display: grid;
+  grid-template-columns: minmax(0, 1.14fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+.duty-card {
+  border: 1px solid var(--game-line);
+  border-radius: 8px;
+  padding: 16px;
+  background: var(--bg-primary);
+}
+.duty-card header,
+.reward-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+.duty-card header span {
+  color: var(--gold);
+  font-size: 0.78rem;
+}
+.duty-form {
+  display: grid;
+  gap: 10px;
+  margin-block: 12px;
+}
+.duty-form fieldset {
+  display: grid;
+  gap: 5px;
+  border: 1px solid var(--game-line);
+  padding: 8px 10px;
+}
+.duty-form legend {
+  padding-inline: 4px;
+  font-size: 0.84rem;
+  font-weight: 650;
+}
+.duty-form label {
+  display: flex;
+  align-items: start;
+  gap: 6px;
+  font-size: 0.82rem;
+}
+.duty-form input {
+  accent-color: var(--neon-green);
+  margin-top: 3px;
+}
+.duty-form button {
+  justify-self: start;
+}
+.exchange-doc {
+  font-size: 0.78rem;
+}
+.reward-list {
+  display: grid;
+  margin-top: 7px;
+}
+.reward-item {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--game-line);
+}
+.reward-item h4 {
+  margin: 0;
+  font-size: 0.9rem;
+  text-shadow: none;
+}
+.reward-item p {
+  color: var(--fg-muted);
+  font-size: 0.78rem;
+  margin: 4px 0;
+}
+.reward-item-action {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.78rem;
+}
+.service-intro p {
+  flex: 1 1 270px;
+  color: var(--fg-muted);
+}
+.contract-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr));
+  gap: 12px;
+}
+.contract-card {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.contract-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.contract-heading h4 {
+  margin: 0;
+  font-size: 1rem;
+}
+.contract-summary,
+.hire-form dl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 17px;
+  margin: 12px 0;
+  padding: 8px 0;
+  border-block: 1px solid var(--game-line);
+  font-size: 0.83rem;
+}
+.contract-summary dt,
+.hire-form dt {
+  font-size: 0.7rem;
+  color: var(--fg-muted);
+}
+.contract-summary dd,
+.hire-form dd {
+  margin: 3px 0 0;
+}
+.contract-scope {
+  margin: 8px 0;
+  padding: 5px 10px;
+  background: var(--bg-primary);
+  font-size: 0.82rem;
+}
+.contract-scope ul {
+  list-style-type: disc;
+}
+.contract-report {
+  white-space: pre-wrap;
+}
+.contract-effect {
+  color: var(--green-success);
+}
+.contract-form,
+.hire-form {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  min-width: 0;
+}
+.hire-form {
+  padding: 14px 18px 18px;
+}
+.contract-form:not(.pvp-card) {
+  margin-block: 10px;
+}
+.contract-form label,
+.hire-form label {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  font-size: 0.83rem;
+}
+.contract-form select,
+.hire-form select {
+  max-width: 100%;
+  min-width: 0;
+}
+.contract-form button,
+.hire-form button {
+  justify-self: start;
+}
+.contract-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 8px;
+}
+.contract-inline input {
+  width: 13ch;
+}
+.exchange-account-grid {
+  align-items: start;
+  margin-top: 12px;
+}
+.exchange-ledger > summary {
+  cursor: pointer;
+}
+.exchange-ledger > h3 {
+  margin-top: 12px;
+}
+@media (max-width: 1050px) {
+  .equipment-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 740px) {
+  .rewards-desk {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 520px) {
+  .equipment-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .product-detail {
+    grid-template-columns: 1fr;
+  }
+  .product-detail .product-art {
+    max-height: 185px;
+    aspect-ratio: 1.5;
+  }
+  .exchange-tabs {
+    gap: 0 3px;
+  }
+  .exchange-tabs > a,
+  .exchange-tabs > button {
+    min-height: 38px;
+    padding: 0 6px;
+    font-size: 0.75rem;
+  }
+  .exchange-header {
+    min-height: 0;
+    padding: 3px 0 4px;
+  }
+}

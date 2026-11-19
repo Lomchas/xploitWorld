@@ -1,30 +1,166 @@
 .terminal-container {
   width: 100%;
-  height: calc(100vh - 32px);
-  background: #0c0c0b;
-  color: #ececea;
-  font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", "Consolas",
-    "Liberation Mono", "DejaVu Sans Mono", monospace;
-  font-size: 14px;
-  line-height: 1.2;
-  padding: 0;
-  margin: 0;
+  min-height: 360px;
+  height: clamp(360px, 65dvh, 760px);
   overflow: hidden;
+  padding: 14px 10px;
+  background: var(--station-screen);
+  border: 1px solid var(--border);
+  border-radius: 8px;
 }
-
 .terminal-container .xterm {
-  width: 100%;
   height: 100%;
 }
-
 .terminal-container .xterm-viewport {
   overflow-y: auto;
 }
-
-.prompt-accent {
-  color: #dac278;
+.terminal-document {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border-top: 1px solid var(--game-line);
+  background: var(--bg-panel);
+  color: var(--fg-primary);
+  overflow-wrap: anywhere;
 }
-
-.text-primary {
-  color: #ececea;
+.terminal-document input {
+  display: block;
+  max-width: 100%;
+  margin: 6px 0;
+  font: inherit;
+}
+.terminal-document img {
+  max-width: 100%;
+  max-height: 50vh;
+  object-fit: contain;
+  object-position: left;
+}
+@media (max-width: 640px) {
+  .terminal-container {
+    height: 68dvh;
+    min-height: 280px;
+    padding: 10px 6px;
+  }
+}
+.terminal-editor {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(100% - 24px, 1050px);
+  max-width: none;
+  height: min(100% - 24px, 760px);
+  max-height: none;
+  padding: 0;
+  overflow: auto;
+  border: 1px solid var(--station-frame);
+  border-radius: 8px;
+  background: var(--bg-panel);
+  color: var(--fg-primary);
+  box-shadow: 0 16px 72px #0009;
+}
+.terminal-editor[open] {
+  display: flex;
+  flex-direction: column;
+}
+.terminal-editor::backdrop {
+  background: #000a;
+}
+.editor-header,
+.editor-status,
+.editor-actions,
+.editor-question {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--game-line);
+}
+.editor-header {
+  justify-content: space-between;
+  overflow-wrap: anywhere;
+}
+.editor-header h2 {
+  margin: 0;
+  font-size: 0.92rem;
+  text-shadow: none;
+}
+.editor-header > span,
+.editor-status {
+  color: var(--fg-muted);
+  font-size: 0.78rem;
+}
+.terminal-editor textarea {
+  flex: 1;
+  width: 100%;
+  min-height: 100px;
+  background: var(--station-screen);
+  color: var(--fg-primary);
+  font: inherit;
+  line-height: 1.5;
+  caret-color: var(--neon-green);
+  padding: 14px 12px;
+  border: 0;
+  border-radius: 0;
+  resize: none;
+  tab-size: 4;
+}
+.terminal-editor textarea:focus-visible {
+  outline-offset: -2px;
+}
+.terminal-editor textarea::selection {
+  background: var(--game-soft);
+  color: var(--fg-primary);
+}
+.editor-status {
+  justify-content: space-between;
+  min-height: 34px;
+}
+.editor-status[role="alert"] {
+  color: var(--gold);
+}
+.editor-actions,
+.editor-question {
+  border-bottom: 0;
+  font-size: 0.8rem;
+}
+.editor-question input {
+  flex: 1 1 190px;
+  min-width: 0;
+  border: 1px solid var(--border);
+  background: var(--bg-primary);
+  border-radius: 4px;
+  padding: 7px;
+}
+.editor-actions button,
+.editor-question button {
+  border: 1px solid var(--game-line);
+  background: var(--bg-primary);
+  border-radius: 4px;
+  padding: 7px 9px;
+}
+.editor-actions button:hover,
+.editor-question button:hover {
+  border-color: var(--neon-green);
+}
+.editor-actions kbd {
+  color: var(--neon-green);
+}
+.editor-actions > span {
+  color: var(--fg-muted);
+}
+.terminal-equipment {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  padding: 5px 10px 10px;
+  font-size: 0.82rem;
+  color: var(--cyan);
+}
+.terminal-equipment a {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.game-play-area:has(.terminal-equipment) .terminal-container {
+  height: calc(100dvh - 92px - 2 * clamp(6px, 1.6vw, 22px));
 }
