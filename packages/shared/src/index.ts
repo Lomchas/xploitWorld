@@ -4,6 +4,7 @@ export * from "./terminal/parser";
 export * from "./pvp/catalog";
 export * from "./pvp/atlas";
 export * from "./pvp/types";
+export * from "./pvp/drill";
 export * from "./pvp/address";
 export * from "./terminal/help";
 export * from "./types/account";

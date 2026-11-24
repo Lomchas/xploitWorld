@@ -14,6 +14,8 @@ import {
   fetchUserProgress,
 } from "../lib/api";
 
+import { CampaignJournal } from "./CampaignJournal";
+
 interface SaveData {
   levels: LevelSummary[];
   progress: UserProgressEntry[];
@@ -47,7 +49,11 @@ export function SavedGamesView() {
     };
   }, [attempt]);
 
-  const completed = data?.progress.filter((entry) => entry.completed) ?? [];
+  const activeIds = new Set(data?.levels.map((level) => level.id));
+  const completed =
+    data?.progress.filter(
+      (entry) => entry.completed && activeIds.has(entry.levelId),
+    ) ?? [];
   const last = completed.reduce<string | null>(
     (latest, entry) =>
       entry.completedAt && (!latest || entry.completedAt > latest)
@@ -129,6 +135,9 @@ export function SavedGamesView() {
               </Link>
             </article>
           </div>
+          {data.levels.length > 0 && (
+            <CampaignJournal levels={data.levels} progress={data.progress} />
+          )}
         </>
       )}
     </section>

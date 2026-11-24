@@ -104,6 +104,28 @@
   padding: 1rem;
   margin: 0.8rem 0;
 }
+.file-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+  margin-block: 0.65rem;
+}
+.file-actions input {
+  color: var(--arena-text);
+  background: #091622;
+  border: 1px solid var(--arena-line);
+  padding: 0.35rem;
+}
+.arena-files li {
+  margin-block: 0.35rem;
+  overflow-wrap: anywhere;
+}
+.file-preview {
+  max-inline-size: 100%;
+  max-block-size: 50vh;
+  object-fit: contain;
+}
 .arena-files h2 {
   margin: 0 0 0.5rem;
 }

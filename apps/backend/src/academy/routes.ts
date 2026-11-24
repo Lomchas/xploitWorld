@@ -9,6 +9,7 @@ import {
   ACADEMY_LESSONS,
   ACADEMY_TOOLS,
   isAcademyLessonId,
+  academyPosition,
   isAcademyToolId,
   isRecord,
   type AcademyCase,
@@ -19,6 +20,7 @@ import {
 import { asyncRoute, HttpError } from "../lib/http";
 import type { AuthenticatedSession } from "../lib/session";
 import { CASES } from "./cases";
+import { academyReport } from "./report";
 import { backendTranslator } from "../locales";
 
 const language = (req: Request) =>
@@ -46,9 +48,9 @@ async function readState(
   const records = new Map(progress.map((row) => [row.lessonId, row]));
   return {
     installed: licenses.map((row) => row.toolId).filter(isAcademyToolId),
-    progress: ACADEMY_LESSONS.map(({ id }, index) => {
+    progress: ACADEMY_LESSONS.map(({ id }) => {
       const current = records.get(id);
-      const previous = ACADEMY_LESSONS[index - 1];
+      const { previous } = academyPosition(id);
       return {
         id,
         unlocked: !previous || Boolean(records.get(previous.id)?.completedAt),
@@ -65,8 +67,7 @@ async function checkAccess(
   id: AcademyLessonId,
   prepared: boolean,
 ) {
-  const index = ACADEMY_LESSONS.findIndex((lesson) => lesson.id === id);
-  const previous = ACADEMY_LESSONS[index - 1];
+  const { previous } = academyPosition(id);
   if (previous) {
     const record = await db.academyProgress.findUnique({
       where: { userId_lessonId: { userId, lessonId: previous.id } },
@@ -187,6 +188,34 @@ export function academyRoutes(db: PrismaClient, auth: RequestHandler): Router {
       res.json(details);
     }),
   );
+  router.get(
+    "/lessons/:id/report",
+    asyncRoute(async (req, res) => {
+      const id = lessonId(req.params.id);
+      const row = await db.academyProgress.findUnique({
+        where: { userId_lessonId: { userId: user(res), lessonId: id } },
+        select: {
+          completedAt: true,
+          attempts: true,
+          reportEs: true,
+          reportEn: true,
+        },
+      });
+      if (!row?.completedAt)
+        throw new HttpError(
+          409,
+          "Completa la práctica antes de exportar el informe.",
+        );
+      const locale = req.get("Accept-Language") === "en" ? "en" : "es";
+      const report =
+        (locale === "en" ? row.reportEn : row.reportEs) ??
+        academyReport(id, row.completedAt, row.attempts, locale, false);
+      res
+        .set("Cache-Control", "private, no-store")
+        .type("text/plain")
+        .send(report);
+    }),
+  );
   router.post(
     "/lessons/:id/submit",
     asyncRoute(async (req, res) => {
@@ -215,8 +244,22 @@ export function academyRoutes(db: PrismaClient, auth: RequestHandler): Router {
           });
           const progress = await tx.academyProgress.findUniqueOrThrow({
             where: { userId_lessonId: key },
-            select: { completedAt: true },
+            select: { completedAt: true, attempts: true },
           });
+          if (accepted && attempt.count && progress.completedAt) {
+            const report = (locale: "es" | "en") =>
+              academyReport(
+                id,
+                progress.completedAt!,
+                progress.attempts,
+                locale,
+                true,
+              );
+            await tx.academyProgress.update({
+              where: { userId_lessonId: key },
+              data: { reportEs: report("es"), reportEn: report("en") },
+            });
+          }
           return {
             accepted: progress.completedAt !== null,
             feedback: attempt.count ? feedback : [],

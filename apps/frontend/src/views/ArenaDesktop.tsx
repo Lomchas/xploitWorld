@@ -1,85 +1,18 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
-  ARENA_WORKSPACE_ROOT,
   formatPvpBtc,
   PVP_REGIONS,
   PVP_TOOLS,
   pvpRegion,
   isPvpRegionId,
   type PvpRegionId,
-  type WorkspaceListing,
 } from "@null-protocol/shared";
-import { listWorkspace } from "../lib/api";
+import { ArenaFiles } from "./ArenaFiles";
 import { useLocale } from "../lib/locale";
 import { arenaName, readSelectedServer } from "../lib/servers";
 import { usePvpWorld } from "../hooks/usePvpWorld";
 import "./ArenaDesktop.css";
-
-function PersonalFiles({ user }: { user: string }) {
-  const { t } = useLocale();
-  const [path, setPath] = useState(ARENA_WORKSPACE_ROOT);
-  const [files, setFiles] = useState<WorkspaceListing>();
-  const [error, setError] = useState("");
-  useEffect(() => {
-    let active = true;
-    void listWorkspace(path)
-      .then((result) => {
-        if (active) {
-          setFiles(result);
-          setError("");
-        }
-      })
-      .catch((reason: unknown) => {
-        if (active)
-          setError(
-            reason instanceof Error
-              ? reason.message
-              : "Falló la lectura de archivos.",
-          );
-      });
-    return () => {
-      active = false;
-    };
-  }, [path, user]);
-  return (
-    <section className="arena-files">
-      <h2>{t("Archivos personales")}</h2>
-      <code>{path.replace(ARENA_WORKSPACE_ROOT, "~/archivos")}</code>
-      {path !== ARENA_WORKSPACE_ROOT && (
-        <button onClick={() => setPath(path.slice(0, path.lastIndexOf("/")))}>
-          {t("Carpeta anterior")}
-        </button>
-      )}
-      {error && <p role="alert">{t(error)}</p>}
-      {files &&
-        (files.entries.length ? (
-          <ul>
-            {files.entries.map((entry) => {
-              const name = entry.path.split("/").at(-1);
-              return (
-                <li key={entry.path}>
-                  {entry.kind === "DIRECTORY" ? (
-                    <button type="button" onClick={() => setPath(entry.path)}>
-                      {name}/
-                    </button>
-                  ) : entry.kind === "TEXT" ? (
-                    <Link to="/terminal" state={{ file: entry.path }}>
-                      {name}
-                    </Link>
-                  ) : (
-                    <span>{name}</span>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        ) : (
-          <p>{t("Esta carpeta está vacía.")}</p>
-        ))}
-    </section>
-  );
-}
 
 export function ArenaDesktop({ wsUrl }: { wsUrl: string }) {
   const { t, locale } = useLocale();
@@ -221,6 +154,10 @@ export function ArenaDesktop({ wsUrl }: { wsUrl: string }) {
               <span aria-hidden="true">◫</span>
               {t("Dispositivo")}
             </Link>
+            <Link to="/entrenamiento">
+              <span aria-hidden="true">✓</span>
+              {t("Desafío de guardia")}
+            </Link>
             <Link to="/arena">
               <span aria-hidden="true">≋</span>
               {t("Panel de arena")}
@@ -238,7 +175,7 @@ export function ArenaDesktop({ wsUrl }: { wsUrl: string }) {
               {t("Aplicaciones")}
             </button>
           </div>
-          {files && <PersonalFiles user={self.id} />}
+          {files && <ArenaFiles key={self.id} />}
           {apps && (
             <section className="arena-files">
               <h2>{t("Aplicaciones instaladas")}</h2>

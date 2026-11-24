@@ -4,6 +4,7 @@ import { Prisma, type PrismaClient } from "@prisma/client";
 import {
   isRecord,
   WORKSPACE_LIMITS,
+  isWorkspaceName,
   WORKSPACE_ROOT,
   type WorkspaceAction,
   type WorkspaceEntry,
@@ -50,16 +51,7 @@ function checkedPath(value: unknown, root: string, allowRoot = false): string {
     throw new HttpError(400, "Usa una ruta dentro de " + root + ".");
   const normalized = value.normalize("NFC");
   const names = normalized.slice(prefix.length).split("/");
-  if (
-    names.some(
-      (name) =>
-        name.length > 80 ||
-        name !== name.trim() ||
-        name === "." ||
-        name === ".." ||
-        !/^[\p{L}\p{M}\p{N} ._()-]+$/u.test(name),
-    )
-  )
+  if (names.some((name) => !isWorkspaceName(name)))
     throw new HttpError(400, "Usa nombres válidos de hasta 80 caracteres.");
   return normalized;
 }

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Navigate, useLocation, useSearchParams } from "react-router-dom";
+import { MISSIONS } from "@null-protocol/shared";
 import { Terminal } from "../components/Terminal/Terminal";
 import { ensureGuestSession, fetchUserProgress } from "../lib/api";
 import { useLocale } from "../lib/locale";
@@ -105,7 +106,15 @@ function Prologue({ onContinue }: { onContinue: () => void }) {
   );
 }
 
-function StorySession({ wsUrl, replay }: { wsUrl: string; replay: boolean }) {
+function StorySession({
+  wsUrl,
+  replay,
+  mission,
+}: {
+  wsUrl: string;
+  replay: boolean;
+  mission?: string;
+}) {
   const { t } = useLocale();
   const [session, setSession] = useState<{
     userId: string;
@@ -174,7 +183,7 @@ function StorySession({ wsUrl, replay }: { wsUrl: string; replay: boolean }) {
   return !finished && (replay || !session.returning) ? (
     <Prologue onContinue={proceed} />
   ) : (
-    <Terminal wsUrl={wsUrl} />
+    <Terminal wsUrl={wsUrl} initialMission={mission} />
   );
 }
 
@@ -188,6 +197,9 @@ export function HistoriaView({ wsUrl }: { wsUrl: string }) {
       key={search}
       wsUrl={wsUrl}
       replay={params.get("intro") === "1"}
+      mission={
+        MISSIONS.find((item) => item.slug === params.get("mision"))?.slug
+      }
     />
   );
 }

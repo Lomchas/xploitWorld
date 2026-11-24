@@ -10,6 +10,9 @@ const Desktop = lazy(() =>
 const Terminal = lazy(() =>
   import("./views/ArenaTerminal").then((m) => ({ default: m.ArenaTerminal })),
 );
+const Drill = lazy(() =>
+  import("./views/ArenaDrill").then((m) => ({ default: m.ArenaDrill })),
+);
 const Device = lazy(() =>
   import("./views/PVPView").then((m) => ({ default: m.PVPView })),
 );
@@ -35,6 +38,7 @@ export default function ArenaApp() {
             element={<Device wsUrl={wsUrl} device />}
           />
           <Route path="/servidores" element={<Atlas wsUrl={wsUrl} />} />
+          <Route path="/entrenamiento" element={<Drill />} />
           <Route path="/contratos" element={<Contracts />} />
           <Route path="*" element={<Navigate to="/pvp" replace />} />
         </Routes>

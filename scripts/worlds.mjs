@@ -2,6 +2,7 @@ import { spawn } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { developmentOrigins } from "./lan-config.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const backend = resolve(root, "apps/backend");
@@ -11,7 +12,9 @@ if (!pnpm) throw new Error("Ejecuta esta tarea con pnpm.");
 
 function readEnvironment(path) {
   const values = {};
-  for (const line of readFileSync(path, "utf8").split(/\r?\n/)) {
+  for (const line of readFileSync(path, "utf8")
+    .replace(/^\uFEFF/u, "")
+    .split(/\r?\n/)) {
     const entry = /^([A-Z_]+)=(.*)$/.exec(line);
     if (entry) values[entry[1]] = entry[2];
   }
@@ -28,6 +31,11 @@ for (const mode of Object.keys(profiles)) {
   if (database) profiles[mode].DATABASE_URL = database;
   if (profiles[mode].GAME_MODE !== mode)
     throw new Error("Configuración de entorno incorrecta para " + mode);
+  if (process.argv[2] === "dev")
+    profiles[mode].FRONTEND_ORIGINS = developmentOrigins(
+      profiles[mode].FRONTEND_ORIGINS || "",
+      mode,
+    );
 }
 const databaseKey = (value) => {
   const url = new URL(value);

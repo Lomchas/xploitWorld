@@ -32,6 +32,7 @@ import { proxyTrust } from "./lib/client-address";
 import { meetsPrerequisites } from "./game/progression";
 import { certificateView } from "./game/campaign/progress";
 import { PvpService } from "./pvp/service";
+import { portalDrill } from "./pvp/drill";
 import { workspaceRoutes } from "./workspace/routes";
 import { academyRoutes } from "./academy/routes";
 import {
@@ -415,6 +416,34 @@ export function createApp(
     message: { error: "Demasiadas acciones PVP. Espera un momento." },
   });
   if (mode !== "story") {
+    const drillPath = "/api/pvp/drills/portal";
+    app.get(
+      drillPath,
+      pvpAuth,
+      asyncRoute(async (_req, res) => {
+        res
+          .set("Cache-Control", "no-store")
+          .json(await portalDrill(db, getSession(res).user.id, false));
+      }),
+    );
+    app.post(
+      drillPath,
+      pvpAuth,
+      actionLimit,
+      asyncRoute(async (req, res) => {
+        if (
+          req.body !== undefined &&
+          (!isRecord(req.body) || Object.keys(req.body).length)
+        )
+          throw new HttpError(
+            400,
+            "La evaluación usa la configuración de tu dispositivo.",
+          );
+        res
+          .set("Cache-Control", "no-store")
+          .json(await portalDrill(db, getSession(res).user.id, true));
+      }),
+    );
     app.get(
       "/api/pvp/state",
       pvpAuth,
@@ -520,6 +549,7 @@ export function createApp(
         "/arena",
         "/dispositivo",
         "/servidores",
+        "/entrenamiento",
         "/contratos",
       ],
       (_req, res) => {

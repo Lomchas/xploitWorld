@@ -79,15 +79,20 @@ export default function App() {
             element={<OpenWorld mode="story" path="/practicas" />}
           />
           <Route path="/exchange" element={<LegacyExchange />} />
-          {["/pvp", "/arena", "/servidores", "/dispositivo", "/contratos"].map(
-            (path) => (
-              <Route
-                key={path}
-                path={path}
-                element={<OpenWorld mode="pvp" path={path} />}
-              />
-            ),
-          )}
+          {[
+            "/pvp",
+            "/arena",
+            "/servidores",
+            "/dispositivo",
+            "/contratos",
+            "/entrenamiento",
+          ].map((path) => (
+            <Route
+              key={path}
+              path={path}
+              element={<OpenWorld mode="pvp" path={path} />}
+            />
+          ))}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

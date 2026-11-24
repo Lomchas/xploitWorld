@@ -114,7 +114,9 @@ function DeployForm({
           {busy ? t("Desplegando…") : t("Entrar al mundo PVP")}
         </button>
       </form>
-      <Link to="/servidores" className="text-link">{t("Elegir arena en el Atlas")}</Link>
+      <Link to="/servidores" className="text-link">
+        {t("Elegir arena en el Atlas")}
+      </Link>
       <Link to="/pvp" className="text-link">
         {t("Abrir mi escritorio")}
       </Link>
@@ -374,6 +376,11 @@ export function PVPView({
   const live = useConnectionStatus(wsUrl) === "open";
   return (
     <div className="pvp-view">
+      {device && location.state?.fromDrill === true && (
+        <Link className="text-link" to="/entrenamiento">
+          {t("Volver al desafío")}
+        </Link>
+      )}
       {pvp.readError && (
         <div className="pvp-feedback pvp-feedback-error" role="alert">
           <span>{t(pvp.readError)}</span>

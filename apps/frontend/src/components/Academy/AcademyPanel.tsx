@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import {
   ACADEMY_LESSONS,
   ACADEMY_TOOLS,
+  academyPosition,
   WORKSPACE_ROOT,
   type AcademyAnswers,
   type AcademyCase,
@@ -14,7 +15,10 @@ import {
   type AcademyToolId,
 } from "@null-protocol/shared";
 import {
+  ApiError,
   fetchAcademyLesson,
+  fetchAcademyReport,
+  readWorkspaceText,
   prepareAcademyLesson,
   submitAcademyAnswers,
   updateWorkspace,
@@ -40,7 +44,7 @@ function CasePanel({
   onState: (value: AcademyState) => void;
   onChoose: (id: AcademyLessonId) => void;
 }) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const tools = ACADEMY_TOOLS.filter((tool) => tool.lessonId === lesson.id);
   const prepared = tools.every((tool) => state.installed.includes(tool.id));
   const [details, setDetails] = useState<AcademyCase | null>(null);
@@ -55,9 +59,7 @@ function CasePanel({
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(false);
   const pending = useRef(false);
-  const index = ACADEMY_LESSONS.findIndex((item) => item.id === lesson.id);
-  const next = ACADEMY_LESSONS[index + 1];
-  const previous = ACADEMY_LESSONS[index - 1];
+  const { number, previous, next, recovery } = academyPosition(lesson.id);
   useEffect(() => {
     if (!prepared || !progress.unlocked) return;
     let current = true;
@@ -76,7 +78,7 @@ function CasePanel({
     return () => {
       current = false;
     };
-  }, [lesson.id, prepared, progress.unlocked, reload]);
+  }, [lesson.id, prepared, progress.unlocked, reload, locale]);
 
   const perform = async (task: () => Promise<void>): Promise<void> => {
     if (pending.current) return;
@@ -111,21 +113,35 @@ function CasePanel({
   };
   const evidence = details?.evidence.find((item) => item.toolId === tab);
   const review = feedback?.review ?? details?.review;
-  const saveReport = (): void => {
+  const reportName =
+    "vanta-" + lesson.id + (locale === "en" ? "-en" : "") + ".txt";
+  const exportReport = (download: boolean): void => {
     if (!review || !progress.completedAt) return;
     void perform(async () => {
-      await updateWorkspace({
-        type: "write",
-        path: `${WORKSPACE_ROOT}/vanta-${lesson.id}.txt`,
-        version: null,
-        text: [
-          t("Expediente Vanta"),
-          t(lesson.title),
-          t("Completada {v1}", { v1: progress.completedAt ?? "" }),
-          "",
-          review,
-        ].join("\n"),
-      });
+      const text = await fetchAcademyReport(lesson.id);
+      if (download) {
+        const url = URL.createObjectURL(
+          new Blob([text], { type: "text/plain;charset=utf-8" }),
+        );
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = reportName;
+        document.body.append(link);
+        link.click();
+        link.remove();
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+        return;
+      }
+      const path = WORKSPACE_ROOT + "/" + reportName;
+      try {
+        await updateWorkspace({ type: "write", path, text, version: null });
+      } catch (error) {
+        if (!(error instanceof ApiError) || error.status !== 409) throw error;
+        if ((await readWorkspaceText(path)).text !== text)
+          throw new Error(
+            "Ya hay un archivo distinto con ese nombre. Puedes descargar el informe a tu equipo.",
+          );
+      }
       setSaved(true);
     });
   };
@@ -133,9 +149,12 @@ function CasePanel({
     <section className="academy-case" aria-labelledby="academy-case-title">
       <header className="academy-header">
         <div>
-          <p className="academy-tier">{t(lesson.tier)}</p>
+          <p className="academy-tier">
+            {t(lesson.tier)}
+            {recovery && " · " + t("Ruta de recuperación")}
+          </p>
           <h2 id="academy-case-title">
-            {index + 1}. {t(lesson.title)}
+            {number}. {t(lesson.title)}
           </h2>
           <p>{t(lesson.goal)}</p>
         </div>
@@ -257,11 +276,18 @@ function CasePanel({
                 <button
                   type="button"
                   disabled={busy || saved}
-                  onClick={saveReport}
+                  onClick={() => exportReport(false)}
                 >
                   {saved
                     ? t("Informe guardado")
                     : t("Guardar informe en Archivos")}
+                </button>
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => exportReport(true)}
+                >
+                  {t("Descargar informe (.txt)")}
                 </button>
                 {next && (
                   <button
@@ -276,7 +302,7 @@ function CasePanel({
               {saved && (
                 <p role="status" className="station-green">
                   {t("Guardado en ")}
-                  <code>~/trabajo/vanta-{lesson.id}.txt</code>.
+                  <code>~/trabajo/{reportName}</code>.
                 </p>
               )}
             </div>
@@ -322,6 +348,12 @@ function CasePanel({
               })}
               {feedback && !feedback.accepted && (
                 <p role="status" className="academy-alert">
+                  {t("Criterios verificados: {done}/{total}", {
+                    done: feedback.feedback.filter((item) => item.correct)
+                      .length,
+                    total: details.questions.length,
+                  })}
+                  {" · "}
                   {t("Revisa las pistas y vuelve a comprobar.")}
                 </p>
               )}

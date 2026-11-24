@@ -7,16 +7,40 @@ const preview =
   window.location.port === "4173" ||
   window.location.port === "4174" ||
   window.location.port === "4175";
+function modeOrigin(
+  configured: string | undefined,
+  localHost: string,
+  port: number,
+) {
+  const hostname = window.location.hostname;
+  const loopback =
+    hostname === "localhost" ||
+    hostname.startsWith("127.") ||
+    hostname === "[::1]" ||
+    hostname.endsWith(".localhost");
+  if (import.meta.env.DEV && !loopback) {
+    const url = new URL(window.location.href);
+    url.port = String(port);
+    return url.origin;
+  }
+  return configured || "http://" + localHost + ":" + port;
+}
 const origins: Record<WebMode, string> = {
-  menu:
-    import.meta.env.VITE_MENU_ORIGIN ||
-    "http://127.0.0.1:" + (preview ? 4173 : 5173),
-  story:
-    import.meta.env.VITE_STORY_ORIGIN ||
-    "http://historia.localhost:" + (preview ? 4174 : 5174),
-  pvp:
-    import.meta.env.VITE_PVP_ORIGIN ||
-    "http://pvp.localhost:" + (preview ? 4175 : 5175),
+  menu: modeOrigin(
+    import.meta.env.VITE_MENU_ORIGIN,
+    "127.0.0.1",
+    preview ? 4173 : 5173,
+  ),
+  story: modeOrigin(
+    import.meta.env.VITE_STORY_ORIGIN,
+    "historia.localhost",
+    preview ? 4174 : 5174,
+  ),
+  pvp: modeOrigin(
+    import.meta.env.VITE_PVP_ORIGIN,
+    "pvp.localhost",
+    preview ? 4175 : 5175,
+  ),
 };
 export function worldUrl(target: WebMode, path = "/"): string {
   const url = new URL(path, origins[target]);

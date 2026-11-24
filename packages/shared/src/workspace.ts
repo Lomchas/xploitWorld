@@ -23,6 +23,16 @@ export function resolveVirtualPath(
   }
   return ("/" + parts.join("/")).normalize("NFC");
 }
+export function isWorkspaceName(name: string): boolean {
+  return (
+    name.length <= 80 &&
+    name === name.trim() &&
+    name !== "." &&
+    name !== ".." &&
+    /^[\p{L}\p{M}\p{N} ._()-]+$/u.test(name)
+  );
+}
+
 export const WORKSPACE_LIMITS = {
   entries: 160,
   fileTextBytes: 16 * 1024,

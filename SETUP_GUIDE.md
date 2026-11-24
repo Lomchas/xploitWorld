@@ -26,6 +26,27 @@ El ZIP incluye `apps/backend/.env`, `apps/backend/.env.pvp` y `apps/frontend/.en
 
 Si ya tienes M6.5, conserva los volúmenes de PostgreSQL y ejecuta `pnpm install --frozen-lockfile` y `pnpm db:setup` en la versión nueva con ambas bases levantadas. La migración registra las nuevas arenas del Atlas. Con `pnpm dev pvp`, abre <http://pvp.localhost:5175/servidores>. El arranque autónomo con `pnpm start:pvp` aplica las migraciones de Arena a la base configurada.
 
+## Acceso por la red local
+
+`pnpm dev` y `pnpm jugar` abren Vite en las interfaces del equipo. El arranque de desarrollo añade sus IPv4 válidas a los orígenes permitidos de cada modo. Los enlaces del menú conservan la IP desde la que entró el jugador.
+
+Comparte la dirección de red del menú, por ejemplo `http://192.168.40.103:5173/`, usando la IPv4 que muestre Vite en tu equipo. Historia usa 5174 y PvP usa 5175. Los jugadores de una partida PvP deben elegir la misma capital del Atlas.
+
+Si una configuración anterior guardó un origen con la IP vacía, detén el juego y ejecuta el reparador con tu IPv4 actual.
+
+```powershell
+pnpm config:lan 192.168.40.103
+pnpm dev
+```
+
+El reparador comprueba la IP antes de escribir y conserva los otros ajustes de las bases. El archivo autónomo XploitworlD_Reparar_LAN.mjs puede ejecutarse dentro de una instalación anterior con `node .\XploitworlD_Reparar_LAN.mjs 192.168.40.103`.
+
+En Windows, una regla de entrada puede permitir los tres puertos desde la subred local. Ejecuta una vez este comando en PowerShell como administrador.
+
+```powershell
+New-NetFirewallRule -DisplayName "XploitworlD LAN" -Direction Inbound -Action Allow -Protocol TCP -LocalPort 5173,5174,5175 -RemoteAddress LocalSubnet -Profile Any
+```
+
 ## Actualizar desde M6.4
 
 Detén el juego anterior y conserva su contenedor y volumen PostgreSQL como origen. La instalación estándar de M6.4 usa `127.0.0.1:5432/nullprotocol`. Levanta también las dos bases nuevas con los comandos anteriores y ejecuta `pnpm db:setup`. Antes de iniciar M6.5 por primera vez, ejecuta lo siguiente.

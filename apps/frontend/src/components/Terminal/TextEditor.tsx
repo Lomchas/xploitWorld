@@ -4,6 +4,8 @@ import { ApiError, updateWorkspace } from "../../lib/api";
 import { useLocale } from "../../lib/locale";
 import { editorPath } from "./editor-command";
 
+import "./Terminal.css";
+
 export interface EditorDocument {
   path: string | null;
   cwd: string;
@@ -272,7 +274,7 @@ export function TextEditor({
             value={name}
             disabled={busy}
             onChange={(event) => setName(event.target.value)}
-            placeholder="~/trabajo/nota.txt"
+            placeholder={t("nota.txt")}
             required
           />
           <button type="submit" disabled={busy}>

@@ -182,6 +182,20 @@ export const PRACTICE_GUIDES: Record<
     takeaway:
       "Verifica el control corregido y comprueba que el servicio autorizado sigue funcionando.",
   },
+  custodia: {
+    art: "forensics",
+    reference: checksum,
+    takeaway: "Verifica la copia antes de incluirla en tu informe.",
+  },
+  restauracion: {
+    art: "recovery",
+    reference: reference(
+      "restic · Restore",
+      "https://restic.readthedocs.io/en/stable/050_restore.html",
+    ),
+    takeaway:
+      "Comprueba el tiempo de recuperación y los registros que recuperó cada copia.",
+  },
   incidente: {
     art: "forensics",
     reference: forensics,

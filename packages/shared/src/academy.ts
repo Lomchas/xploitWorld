@@ -65,10 +65,38 @@ export const ACADEMY_LESSONS = [
     tier: "Avanzado",
     goal: "Correlacionar registros, preservar evidencia y justificar la contención.",
   },
+  {
+    id: "custodia",
+    title: "La copia de guardia",
+    tier: "Básico",
+    goal: "Verificar una copia contra el registro de custodia y documentar una diferencia.",
+  },
+  {
+    id: "restauracion",
+    title: "El ensayo de regreso",
+    tier: "Intermedio",
+    goal: "Elegir un respaldo por pérdida admisible y comprobar los datos después de restaurarlo.",
+  },
 ] as const;
 
 export type AcademyLessonId = (typeof ACADEMY_LESSONS)[number]["id"];
 export type AcademyTier = (typeof ACADEMY_LESSONS)[number]["tier"];
+
+const recoveryTrack = new Set<AcademyLessonId>(["custodia", "restauracion"]);
+
+export function academyPosition(id: AcademyLessonId) {
+  const recovery = recoveryTrack.has(id);
+  const track = ACADEMY_LESSONS.filter(
+    (lesson) => recoveryTrack.has(lesson.id) === recovery,
+  );
+  const index = track.findIndex((lesson) => lesson.id === id);
+  return {
+    number: index + 1,
+    previous: track[index - 1],
+    next: track[index + 1],
+    recovery,
+  };
+}
 
 export const ACADEMY_TOOLS = [
   {
@@ -238,6 +266,33 @@ export const ACADEMY_TOOLS = [
     lessonId: "incidente",
     description:
       "Revisa qué metadatos deben retirarse de una copia para compartir.",
+  },
+  {
+    id: "sha256sum",
+    name: "sha256sum",
+    lessonId: "custodia",
+    description:
+      "Contrasta las huellas de dos copias con un manifiesto firmado.",
+  },
+  {
+    id: "diff",
+    name: "diff",
+    lessonId: "custodia",
+    description:
+      "Compara las líneas que cambiaron entre dos listados del caso.",
+  },
+  {
+    id: "restic",
+    name: "restic",
+    lessonId: "restauracion",
+    description: "Lee las horas y los resultados de un ensayo de restauración.",
+  },
+  {
+    id: "jq",
+    name: "jq",
+    lessonId: "restauracion",
+    description:
+      "Contrasta los conteos y los identificadores del catálogo restaurado.",
   },
 ] as const satisfies readonly {
   id: string;

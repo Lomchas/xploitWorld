@@ -11,6 +11,7 @@ import {
   WORKSPACE_ROOT,
   pvpRegion,
   type ExchangeState,
+  type ArenaDrillResult,
   type PvpJoinResult,
   type PvpState,
   type WorldState,
@@ -195,6 +196,86 @@ describe("Independent Story and Arena runtime", { skip: !database }, () => {
     assert.equal(JSON.parse(String(data)).type, "error");
     ws.close();
     await assert.rejects(verifyWorldDatabase(arena.db, "story"));
+  });
+
+  it("grades the virtual device on the server and awards the duty badge only once", async () => {
+    const url = "/api/pvp/drills/portal";
+    const operator = await guest(arena);
+    const campaign = await guest(story);
+    assert.equal((await ask(story, url, campaign.cookie)).status, 404);
+    assert.equal(
+      (
+        await ask(
+          arena,
+          "/api/academy/lessons/custodia/report",
+          operator.cookie,
+        )
+      ).status,
+      404,
+    );
+    assert.equal((await ask(arena, url)).status, 401);
+    assert.equal((await ask(arena, url, operator.cookie)).status, 409);
+    const deployment = await ask(arena, "/api/pvp/join", operator.cookie, {
+      regionId: "bogota",
+      alias: "duty-guard",
+      hostname: "guard-pc",
+    });
+    assert.equal(deployment.status, 201);
+    const { self } = (await deployment.json()) as PvpJoinResult;
+    const assess = async (body?: object) => {
+      const result = await ask(arena, url, operator.cookie, body);
+      assert.equal(result.status, 200);
+      return (await result.json()) as ArenaDrillResult;
+    };
+    assert.equal(
+      (await ask(arena, url, operator.cookie, { checks: [], completed: true }))
+        .status,
+      400,
+    );
+    const initial = await assess({});
+    assert.equal(initial.completedAt, null);
+    assert.deepEqual(
+      initial.checks.filter((c) => c.passed).map((c) => c.id),
+      ["dns"],
+    );
+    const configure = async (input: object) => {
+      const res = await ask(arena, "/api/pvp/action", operator.cookie, {
+        requestId: randomUUID(),
+        arenaVisit: self.arenaVisit,
+        action: input,
+      });
+      assert.equal(res.status, 200, await res.text());
+    };
+    await configure({ type: "service", service: "admin", open: false });
+    await configure({ type: "tls", enabled: true });
+    await configure({ type: "patch", service: "web" });
+    const restarting = await assess();
+    assert.equal(
+      restarting.checks.find((check) => check.id === "patch")?.passed,
+      false,
+    );
+    await new Promise((done) => setTimeout(done, 3100));
+    assert.equal((await assess()).completedAt, null);
+    const [first, again] = await Promise.all([assess({}), assess({})]);
+    assert.ok(first.completedAt);
+    assert.equal(first.completedAt, again.completedAt);
+    assert.ok(first.checks.every((c) => c.passed));
+    await configure({ type: "service", service: "dns", open: false });
+    const changed = await assess({});
+    assert.equal(changed.completedAt, first.completedAt);
+    assert.equal(changed.checks.find((c) => c.id === "dns")?.passed, false);
+    assert.equal(
+      await arena.db.arenaDrillCompletion.count({
+        where: { profileId: self.id },
+      }),
+      1,
+    );
+    assert.equal(
+      (
+        await arena.db.user.findUniqueOrThrow({ where: { id: operator.id } })
+      ).balanceSats.toString(),
+      self.balanceSats,
+    );
   });
 
   it("buys Story equipment and settles an Arena contract without a Story prerequisite", async () => {

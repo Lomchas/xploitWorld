@@ -565,6 +565,92 @@ describe(
       }
     });
 
+    it("opens the optional recovery track to a new save and archives a private bilingual rubric on first pass", async () => {
+      const start = await api("/api/session", { method: "POST" }, "");
+      const student = start.headers.get("set-cookie")!.split(";")[0]!;
+      const {
+        user: { id: userId },
+      } = (await start.json()) as { user: { id: string } };
+      const route = "/api/academy/lessons/custodia";
+      const post = (body = {}) => ({
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      assert.equal((await api(route + "/report", {}, student)).status, 409);
+      assert.equal(
+        (
+          await api(
+            "/api/academy/lessons/restauracion/prepare",
+            post(),
+            student,
+          )
+        ).status,
+        409,
+      );
+      assert.equal(
+        (await api(route + "/prepare", post(), student)).status,
+        200,
+      );
+      const partial = await api(
+        route + "/submit",
+        post({ answers: { integridad: 1, limite: 0 } }),
+        student,
+      );
+      assert.equal(
+        ((await partial.json()) as AcademyResult).feedback.filter(
+          (f) => f.correct,
+        ).length,
+        1,
+      );
+      assert.equal((await api(route + "/report", {}, student)).status, 409);
+      const pass = () =>
+        api(
+          route + "/submit",
+          post({ answers: { integridad: 1, limite: 2 } }),
+          student,
+        );
+      const passes = await Promise.all([pass(), pass()]);
+      assert.ok(passes.every((r) => r.status === 200));
+      const report = (lang: string) =>
+        api(
+          route + "/report",
+          { headers: { "Accept-Language": lang } },
+          student,
+        ).then((r) => r.text());
+      const es = await report("es"),
+        en = await report("en");
+      assert.match(es, /Criterios verificados: 2\/2/);
+      assert.match(en, /Criteria verified: 2\/2/);
+      assert.match(en, /Recorded attempts: 2/);
+      assert.match(en, /The row matches/);
+      assert.match(en, /Scenario version: 1/);
+      const stranger = (
+        await api("/api/session", { method: "POST" }, "")
+      ).headers
+        .get("set-cookie")!
+        .split(";")[0]!;
+      assert.equal((await api(route + "/report", {}, stranger)).status, 409);
+      assert.equal(
+        (
+          await api(
+            "/api/academy/lessons/restauracion/prepare",
+            post(),
+            student,
+          )
+        ).status,
+        200,
+      );
+      await db.academyProgress.update({
+        where: { userId_lessonId: { userId, lessonId: "custodia" } },
+        data: { reportEn: null, reportEs: null },
+      });
+      assert.match(
+        await report("en"),
+        /criteria for that attempt were not archived/,
+      );
+    });
+
     it("preserves educational licenses and grades the complete Story curriculum", async () => {
       const guest = await api("/api/session", { method: "POST" }, "");
       const student = guest.headers.get("set-cookie")!.split(";")[0]!;
@@ -581,7 +667,10 @@ describe(
         api("/api/academy" + path, options, student);
       const initial = (await (await academy()).json()) as AcademyState;
       assert.deepEqual(initial.installed, []);
-      assert.equal(initial.progress.filter((row) => row.unlocked).length, 1);
+      assert.deepEqual(
+        initial.progress.filter((row) => row.unlocked).map((row) => row.id),
+        ["inventario", "custodia"],
+      );
       assert.equal((await api("/api/academy", {}, "")).status, 401);
       assert.equal(
         (await academy("/licenses/desconocida", post())).status,

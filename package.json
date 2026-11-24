@@ -11,6 +11,7 @@
   "packageManager": "pnpm@9.15.9",
   "scripts": {
     "dev": "node scripts/worlds.mjs dev",
+    "config:lan": "node scripts/lan-config.mjs",
     "jugar": "node scripts/play.mjs",
     "servidor:config": "node scripts/server.mjs config",
     "servidor:iniciar": "node scripts/server.mjs start",

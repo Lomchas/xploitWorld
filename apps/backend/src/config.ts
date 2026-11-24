@@ -1,5 +1,6 @@
 import { bool, cleanEnv, host, port, str } from "envalid";
 import { readProxyIps } from "./lib/client-address";
+import { readFrontendOrigins } from "./lib/origins";
 
 export const config = cleanEnv(process.env, {
   GAME_MODE: str({ choices: ["story", "pvp"] }),
@@ -17,7 +18,5 @@ export const config = cleanEnv(process.env, {
     choices: ["development", "test", "production"],
   }),
 });
-export const allowedOrigins = config.FRONTEND_ORIGINS.split(",").map(
-  (value) => new URL(value.trim()).origin,
-);
+export const allowedOrigins = readFrontendOrigins(config.FRONTEND_ORIGINS);
 export const trustedProxyIps = readProxyIps(config.TRUST_PROXY_IPS);

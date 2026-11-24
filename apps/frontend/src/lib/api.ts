@@ -1,6 +1,7 @@
 import { translate } from "@null-protocol/shared";
 import { readLocale } from "./locale";
 import type {
+  ArenaDrillResult,
   AcademyAnswers,
   AcademyCase,
   AcademyLessonId,
@@ -189,6 +190,11 @@ export function transferPvp(
   });
 }
 
+export const readPortalDrill = (): Promise<ArenaDrillResult> =>
+  request("/pvp/drills/portal");
+export const submitPortalDrill = (): Promise<ArenaDrillResult> =>
+  request("/pvp/drills/portal", { method: "POST" });
+
 const workspaceUrl = (endpoint: string, path: string) =>
   `/workspace/${endpoint}?path=${encodeURIComponent(path)}`;
 
@@ -201,6 +207,8 @@ export const prepareAcademyLesson = (
   request(`/academy/lessons/${id}/prepare`, { method: "POST" });
 export const fetchAcademyLesson = (id: AcademyLessonId): Promise<AcademyCase> =>
   request(`/academy/lessons/${id}`);
+export const fetchAcademyReport = (id: AcademyLessonId): Promise<string> =>
+  request(`/academy/lessons/${id}/report`, {}, (response) => response.text());
 export const submitAcademyAnswers = (
   id: AcademyLessonId,
   answers: AcademyAnswers,

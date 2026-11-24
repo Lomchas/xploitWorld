@@ -54,8 +54,9 @@ const INPUT_CONTROLS = /[\x00-\x1f\x7f-\x9f]/;
 
 interface TerminalProps {
   wsUrl: string;
+  initialMission?: string;
 }
-export function Terminal({ wsUrl }: TerminalProps) {
+export function Terminal({ wsUrl, initialMission }: TerminalProps) {
   const { t, locale } = useLocale();
   const containerRef = useRef<HTMLDivElement>(null);
   const closeEditor = useRef<(savedPath?: string) => void>(() => undefined);
@@ -102,7 +103,9 @@ export function Terminal({ wsUrl }: TerminalProps) {
     const observer = new ResizeObserver(resize);
     observer.observe(container);
     const client = getWsClient(wsUrl);
-    const resume = locale === "en" ? "mission continue" : "mission continuar";
+    const autoResume =
+      locale === "en" ? "mission continue" : "mission continuar";
+    let resume = initialMission ? "mission " + initialMission : autoResume;
     let disposed = false;
     let busy = true;
     let ready = false;
@@ -262,6 +265,7 @@ export function Terminal({ wsUrl }: TerminalProps) {
             : t("[-] Flag incorrecta. Sigue investigando.\n"),
         );
         if (submission.accepted) {
+          resume = autoResume;
           window.dispatchEvent(new Event("xwd:progress"));
           const current = MISSIONS.findIndex(
             (mission) => mission.slug === level.slug,
@@ -314,6 +318,13 @@ export function Terminal({ wsUrl }: TerminalProps) {
       }
       const response = await client.execute(raw, locale);
       cwd = response.cwd;
+      if (
+        (command === "mission" || command === "branch") &&
+        args.length === 1 &&
+        response.exitCode === 0
+      )
+        resume = raw;
+      if (response.progressChanged) resume = autoResume;
       if (response.requiredItem) setNeededItem(response.requiredItem);
       else if (command === "mission" && response.exitCode === 0)
         setNeededItem(null);
@@ -520,7 +531,7 @@ export function Terminal({ wsUrl }: TerminalProps) {
       resizeListener.dispose();
       term.dispose();
     };
-  }, [wsUrl, history, locale, t]);
+  }, [wsUrl, history, locale, t, initialMission]);
   return (
     <>
       {neededItem && (

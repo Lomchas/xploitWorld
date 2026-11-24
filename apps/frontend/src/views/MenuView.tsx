@@ -3,7 +3,7 @@ import { useLocale } from "../lib/locale";
 
 import { worldUrl } from "../lib/world-mode";
 
-export const GAME_VERSION = "M6.5";
+export const GAME_VERSION = "M6.6";
 
 export function MenuView() {
   const { t } = useLocale();

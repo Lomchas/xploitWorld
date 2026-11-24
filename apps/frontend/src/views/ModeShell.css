@@ -15,6 +15,23 @@
   padding: 0.4rem 0.7rem;
   border-radius: 4px;
 }
+.campaign-journal {
+  margin-block: 1.5rem;
+}
+.campaign-journal ol {
+  padding-inline-start: 1.5rem;
+}
+.campaign-journal li {
+  padding-block: 0.55rem;
+  border-bottom: 1px solid var(--game-line);
+}
+.campaign-journal p {
+  margin-block: 0.25rem;
+}
+.campaign-journal select {
+  color: var(--fg-primary);
+  background: var(--bg-primary);
+}
 .mode-footer {
   padding: 1rem max(1rem, 3vw);
 }

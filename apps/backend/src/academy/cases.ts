@@ -36,6 +36,115 @@ function check(
 }
 
 export const CASES: Record<AcademyLessonId, CaseFile> = {
+  custodia: {
+    briefing:
+      "Alma entrega un manifiesto firmado por la guardia y dos copias del índice. La firma ya fue validada. Decide qué copia usar para investigar por qué desapareció una ciudad del catálogo.",
+    evidence: [
+      {
+        toolId: "sha256sum",
+        title: "Registro de custodia del índice",
+        columns: ["Origen de la huella", "SHA-256"],
+        rows: [
+          [
+            "Manifiesto firmado",
+            "e420cd23aab875aa8e52271632fd70082490465d3c440ef044a4a77d31ba5b56",
+          ],
+          [
+            "copia-A",
+            "c733e2eede997443749580751db0ed883c070f60a8dfc8c383d72ebe75a1e91a",
+          ],
+          [
+            "copia-B",
+            "e420cd23aab875aa8e52271632fd70082490465d3c440ef044a4a77d31ba5b56",
+          ],
+        ],
+      },
+      {
+        toolId: "diff",
+        title: "Diferencias respecto al índice firmado",
+        columns: ["Copia de trabajo", "Registro V-017"],
+        rows: [
+          ["copia-A", "Falta la fila de Vanta."],
+          ["copia-B", "La fila coincide."],
+        ],
+      },
+    ],
+    checks: [
+      {
+        id: "integridad",
+        prompt: "¿Qué copia respalda el manifiesto de la guardia?",
+        options: [
+          "copia-A",
+          "copia-B",
+          "Las dos, porque tienen el mismo nombre de índice.",
+        ],
+        answer: 1,
+        hint: "Compara la huella completa de cada copia con la del manifiesto.",
+      },
+      {
+        id: "limite",
+        prompt: "¿Qué permite concluir la fila que falta?",
+        options: [
+          "Alma borró la ciudad a las 00:17.",
+          "Es seguro reemplazar el original con la copia A.",
+          "La copia A difiere del índice. Falta evidencia para atribuir el cambio.",
+        ],
+        answer: 2,
+        hint: "El cotejo muestra un cambio en los datos. Busca qué evidencia identifica al autor.",
+      },
+    ],
+    review:
+      "Conserva ambas copias. Usa B como copia verificada y registra la fila ausente en A como hallazgo separado. Una diferencia por sí sola no identifica al responsable.",
+  },
+  restauracion: {
+    briefing:
+      "El índice dejó de responder a las 04:20 UTC. La guardia admite perder hasta cinco minutos de datos y dispone de diez minutos para restablecer la consulta. Los 120 identificadores del manifiesto deben quedar completos y sin duplicados.",
+    evidence: [
+      {
+        toolId: "restic",
+        title: "Ensayo de restauración de las instantáneas",
+        columns: ["Instantánea", "Último dato UTC", "Tiempo hasta consulta"],
+        rows: [
+          ["A", "04:11", "6 min"],
+          ["B", "04:17", "8 min"],
+          ["C", "04:18", "12 min"],
+        ],
+      },
+      {
+        toolId: "jq",
+        title: "Validación del catálogo restaurado desde B",
+        columns: ["Medida", "Esperado", "Observado"],
+        rows: [
+          ["Número de filas", "120", "120"],
+          ["Identificadores distintos", "120", "119"],
+          ["Identificador faltante", "—", "V-044"],
+          ["Identificador duplicado", "—", "V-043"],
+        ],
+      },
+    ],
+    checks: [
+      {
+        id: "ventana",
+        prompt: "¿Qué instantánea cumple ambos límites de tiempo?",
+        options: ["A", "B", "C"],
+        answer: 1,
+        hint: "Resta la hora del último dato de las 04:20 y comprueba también la duración del ensayo.",
+      },
+      {
+        id: "aceptacion",
+        prompt: "¿Qué debe hacer la guardia antes de reabrir el catálogo?",
+        options: [
+          "Aceptar B porque volvió a tener 120 filas.",
+          "Eliminar una fila al azar para compensar el duplicado.",
+          "Investigar V-043 y V-044 y repetir la comprobación contra el manifiesto.",
+        ],
+        answer: 2,
+        hint: "Compara los identificadores distintos con el total exigido en el encargo.",
+      },
+    ],
+    review:
+      "B pierde tres minutos y recupera la consulta en ocho. El recuento de filas parece correcto, pero V-043 aparece dos veces y falta V-044. La aceptación requiere cotejar de nuevo los identificadores con el manifiesto.",
+  },
   inventario: {
     briefing:
       "ECO-7 reabrió una copia del Archivo de Vanta. El catálogo debe estar disponible para visitantes. La consola de mantenimiento pertenece al segmento de operadores. Compara el inventario con el registro web.",

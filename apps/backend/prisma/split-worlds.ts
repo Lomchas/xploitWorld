@@ -163,7 +163,10 @@ async function snapshot() {
         tx.command.findMany(),
         tx.workspaceEntry.findMany(),
         tx.academyLicense.findMany(),
-        tx.academyProgress.findMany(),
+        // M6.4 rows predate the archived bilingual reports.
+        tx.$queryRaw<
+          Prisma.AcademyProgressCreateManyInput[]
+        >`SELECT * FROM academy_progress`,
         tx.campaignRun.findMany(),
         tx.inventoryItem.findMany(),
         tx.walletEntry.findMany(),
